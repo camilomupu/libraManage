@@ -9,3 +9,4 @@ class User(BaseModel):
 
 class UserCreate(User):
     contrasena: str
+

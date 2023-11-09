@@ -1,5 +1,5 @@
 from schemas.user import UserCreate
-from models.tables import *
+from models.tables import Usuario
 
 def create_user(new_user: UserCreate, db):
 
@@ -22,3 +22,4 @@ def delete_users(id: str, db):
     db.delete(usr)
     db.commit()
     return usr
+

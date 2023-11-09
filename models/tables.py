@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from config.db import Base
 
 
-#usuarios
+# usuarios
 class Usuario(Base):
     __tablename__ = "usuarios"
 
@@ -15,60 +15,68 @@ class Usuario(Base):
     id_rol = Column(Integer, ForeignKey("roles.id"))
 
     rol = relationship("Rol", back_populates="usuario")
+
     informe = relationship("Informe", back_populates="usuario")
-    
+
     compraLibro = relationship("CompraLibro", back_populates="usuario")
-    
+
     prestamo = relationship("Prestamo", back_populates="usuario")
-    
+
+
 class Rol(Base):
     __tablename__ = "roles"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(100))
-    
+    nombre = Column(String(100))
+
     usuario = relationship("Usuario", back_populates="rol")
-    
+
+
 class Informe(Base):
     __tablename__ = "informes"
     id = Column(Integer, primary_key=True, autoincrement=True)
     fechaGeneracion = Column(Date)
-    numeroLibrosPrestados = Column(Integer) 
-    numeroLibrosNoDevueltos = Column(Integer) 
+    numeroLibrosPrestados = Column(Integer)
+    numeroLibrosNoDevueltos = Column(Integer)
     numeroComprasLibros = Column(Integer)
     id_usuario = Column(Integer, ForeignKey("usuarios.id"))
-    
+
     usuario = relationship("Usuario", back_populates="informe")
-    
-#libros
+
+
+# libros
+
 
 class Categoria(Base):
     __tablename__ = "categorias"
-    id = Column(Integer, primary_key = True, autoincrement = True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     nombre = Column(String(100))
     descripcion = Column(String(100))
-    
+
     libroDigital = relationship("LibroDigital", back_populates="categoria")
     libroFisico = relationship("LibroFisico", back_populates="categoria")
 
+
 class SubCategoria(Base):
     __tablename__ = "subCategorias"
-    id = Column(Integer, primary_key = True, autoincrement = True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     nombre = Column(String(100))
-    
+
     libroDigital = relationship("LibroDigital", back_populates="subCategoria")
     libroFisico = relationship("LibroFisico", back_populates="subCategoria")
 
 
 class Autor(Base):
     __tablename__ = "autores"
-    id = Column(Integer, primary_key = True,  autoincrement = True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     nombre = Column(String(100))
-    
+
     libroDigital = relationship("LibroDigital", back_populates="autor")
     libroFisico = relationship("LibroFisico", back_populates="autor")
 
-#libroDigital
+
+# libroDigital
+
 
 class LibroDigital(Base):
     __tablename__ = "librosDigitales"
@@ -80,24 +88,26 @@ class LibroDigital(Base):
     id_autor = Column(Integer, ForeignKey("autores.id"))
     id_subcategoria = Column(Integer, ForeignKey("subCategorias.id"))
     id_categoria = Column(Integer, ForeignKey("categorias.id"))
-    
+
     autor = relationship("Autor", back_populates="libroDigital")
     subCategoria = relationship("SubCategoria", back_populates="libroDigital")
     categoria = relationship("Categoria", back_populates="libroDigital")
-    
+
     compraLibro = relationship("CompraLibro", back_populates="libroDigital")
-    
+
+
 class CompraLibro(Base):
     __tablename__ = "comprasLibros"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     id_usuario = Column(Integer, ForeignKey("usuarios.id"))
     id_libroDigital = Column(Integer, ForeignKey("librosDigitales.id"))
-    
+
     usuario = relationship("Usuario", back_populates="compraLibro")
     libroDigital = relationship("LibroDigital", back_populates="compraLibro")
-    
-#LibroFisico
+
+
+# LibroFisico
 class LibroFisico(Base):
     __tablename__ = "librosFisicos"
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -107,13 +117,14 @@ class LibroFisico(Base):
     id_autor = Column(Integer, ForeignKey("autores.id"))
     id_subcategoria = Column(Integer, ForeignKey("subCategorias.id"))
     id_categoria = Column(Integer, ForeignKey("categorias.id"))
-    
+
     autor = relationship("Autor", back_populates="libroFisico")
     subCategoria = relationship("SubCategoria", back_populates="libroFisico")
     categoria = relationship("Categoria", back_populates="libroFisico")
-    
+
     prestamo = relationship("Prestamo", back_populates="libroFisico")
-    
+
+
 class Prestamo(Base):
     __tablename__ = "prestamos"
 
@@ -122,11 +133,12 @@ class Prestamo(Base):
     fechaVemcimiento = Column(Date)
     id_usuario = Column(Integer, ForeignKey("usuarios.id"))
     id_libroFisico = Column(Integer, ForeignKey("librosFisicos.id"))
-    
+
     usuario = relationship("Usuario", back_populates="prestamo")
     libroFisico = relationship("LibroFisico", back_populates="prestamo")
     multa = relationship("Multa", back_populates="prestamo")
-    
+
+
 class Multa(Base):
     __tablename__ = "multas"
 
@@ -135,5 +147,5 @@ class Multa(Base):
     fechaDePago = Column(String(100))
     estadoMulta = Column(String(100))
     id_prestamo = Column(Integer, ForeignKey("prestamos.id"))
-    
+
     prestamo = relationship("Prestamo", back_populates="multa")
