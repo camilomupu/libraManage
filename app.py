@@ -23,9 +23,8 @@ app.include_router(subcategory.router, tags=["SubCategory"])
 
 app.include_router(author.router, tags=["Author"])  
 
-app.include_router(fine.router, tags=["fine"])  
+app.include_router(fine.router, tags=["Fine"])  
 
-app.include_router(author.router, tags=["author"])  
 
 @app.get("/", tags=["Main"])
 def main():

@@ -1,42 +1,39 @@
-#van a ir todas las rutas relacionadas con el multa
+#van a ir todas las rutas relacionadas con el fine
 from fastapi import APIRouter, Depends
-from schemas.fine import Fine, MultaCreate
+from schemas.fine import Fine, FineCreate
 from config.db import get_db
 from sqlalchemy.orm import Session
-from controllers.fine import create_author, exist_author, all_authors, delete_authors
+from controllers.fine import create_fine, exist_fine, all_fines, delete_fines
 
 
 router = APIRouter()
 
-#nuevo multa
+#nuevo fine
 @router.post("/new_fine/")
-def create_new_author(multa: MultaCreate, db: Session = Depends(get_db)):
-    exist = exist_author(multa.id_multa, db)
-    if exist:
-        return {"message": "Fine already exist"}
-    new_author = create_author(multa,db)
-    return Fine(**new_author.__dict__)
+def create_new_fine(fine: Fine, db: Session = Depends(get_db)):
+    new_fine = create_fine(fine,db)
+    return Fine(**new_fine.__dict__)
 
 
-#obtener multa por id_multa
-@router.get("/{id_multa}")
-def get_author(id_multa: int, db: Session = Depends(get_db)):
-    exist = exist_author(id_multa, db)
+#obtener fine por id_fine
+@router.get("/{id_fine}")
+def get_fine(id_fine: int, db: Session = Depends(get_db)):
+    exist = exist_fine(id_fine, db)
     if not exist:
         return {"message": "Fine not exist"}
     
     return Fine(**exist.__dict__)
     
 
-#obtener todos los multas
-@router.get("/all/", response_model=list[Fine])
-def get_all_authors(db: Session = Depends(get_db)):
-    return all_authors(db)
+#obtener todos los fines
+@router.get("/all/", response_model=list[FineCreate])
+def get_all_fines(db: Session = Depends(get_db)):
+    return all_fines(db)
 
-#eliminar multas por id_multa
-@router.delete("/delete/{id_multa}")
-def delete_author(id_multa: str, db: Session = Depends(get_db)):
-    authorDeleted = delete_authors(id_multa, db)
-    if not authorDeleted:
+#eliminar fines por id_fine
+@router.delete("/delete/{id_fine}")
+def delete_fine(id_fine: str, db: Session = Depends(get_db)):
+    fineDeleted = delete_fines(id_fine, db)
+    if not fineDeleted:
         return {"message": "Fine not exist"}
-    return {"message": "Fine deleted successfully", "fine": Fine(**authorDeleted.__dict__)}
+    return {"message": "Fine deleted successfully", "fine": Fine(**fineDeleted.__dict__)}
