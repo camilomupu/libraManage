@@ -12,8 +12,9 @@ class Usuario(Base):
     correo = Column(String(100), unique=True)
     contrasena = Column(String(100))
     fechaNacimiento = Column(Date)
+    id_rol = Column(Integer, ForeignKey("roles.id"))
 
-    usuarioRol = relationship("UsuarioRol", back_populates="usuario")
+    rol = relationship("Rol", back_populates="usuario")
     informe = relationship("Informe", back_populates="usuario")
     
     compraLibro = relationship("CompraLibro", back_populates="usuario")
@@ -26,17 +27,7 @@ class Rol(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(100))
     
-    usuarioRol = relationship("UsuarioRol", back_populates="rol")
-
-class UsuarioRol(Base):
-    __tablename__ = "usuariosRoles"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    id_usuario = Column(Integer, ForeignKey("usuarios.id"))
-    id_rol = Column(Integer, ForeignKey("roles.id"))
-
-    usuario = relationship("Usuario", back_populates="usuarioRol")
-    rol = relationship("Rol", back_populates="usuarioRol")
+    usuario = relationship("Usuario", back_populates="rol")
     
 class Informe(Base):
     __tablename__ = "informes"

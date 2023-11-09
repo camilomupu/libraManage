@@ -5,6 +5,7 @@ class User(BaseModel):
     nombre: str
     correo: str
     fechaNacimiento: date
+    id_rol: int
 
 class UserCreate(User):
     contrasena: str
