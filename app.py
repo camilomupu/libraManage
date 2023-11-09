@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from config.db import Base, engine
-from routes import user, physicalBook, loan, digitalBook, buyBook
+from routes import user, physicalBook, loan, digitalBook, buyBook, category, subcategory
 
 Base.metadata.create_all(bind=engine)
 #Base.metadata.drop_all(engine) #borra toda la metadata, cuidado 
@@ -16,6 +16,10 @@ app.include_router(loan.router, tags=["Loan"])
 app.include_router(digitalBook.router, tags=["DigitalBook"])
 
 app.include_router(buyBook.router, tags=["BuyBook"])
+
+app.include_router(category.router, tags=["Category"])
+
+app.include_router(subcategory.router, tags=["SubCategory"])  
 
 
 @app.get("/", tags=["Main"])
