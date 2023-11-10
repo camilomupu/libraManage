@@ -7,5 +7,8 @@ class Loan(BaseModel):
     fechaVemcimiento : date
     id_usuario : int
     id_libroFisico : int
+
+class LoanOut(Loan):
+    id : int
     
     

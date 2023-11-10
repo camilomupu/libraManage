@@ -1,6 +1,6 @@
 # van a ir todas las rutas relacionadas con el usuario
 from fastapi import APIRouter, Depends
-from schemas.user import User, UserCreate
+from schemas.user import User, UserCreate, UserOut
 from config.db import get_db
 from sqlalchemy.orm import Session
 from controllers.user import create_user, exist_user, all_users, delete_users
@@ -26,18 +26,18 @@ def get_user(correo: str, db: Session = Depends(get_db)):
     if not exist:
         return {"message": "User not exist"}
 
-    return User(**exist.__dict__)
+    return UserOut(**exist.__dict__)
 
 
 # obtener todos los usuarios
-@router.get("/all/", response_model=list[User])
+@router.get("/all_users/")
 def get_all_users(db: Session = Depends(get_db)):
     return all_users(db)
 
 
 # eliminar usuarios por id
 @router.delete("/delete/{id}")
-def delete_user(id: str, db: Session = Depends(get_db)):
+def delete_user(id: int, db: Session = Depends(get_db)):
     userDeleted = delete_users(id, db)
     if not userDeleted:
         return {"message": "User not exist"}

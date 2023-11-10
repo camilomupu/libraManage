@@ -7,3 +7,6 @@ class Report(BaseModel):
     numeroLibrosNoDevueltos: int
     numeroComprasLibros: int
     id_usuario: int
+
+class ReportOut(Report):
+    id: int

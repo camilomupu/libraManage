@@ -15,7 +15,7 @@ def exist_physicalBook(titulo: str, db):
 def all_physicalBook(db):
     return db.query(LibroFisico).all()
 
-def delete_physicalBook(id: str, db):
+def delete_physicalBook(id: int, db):
     book = db.query(LibroFisico).filter(LibroFisico.id == id).first()
     db.delete(book)
     db.commit()

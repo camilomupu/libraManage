@@ -25,11 +25,11 @@ def get_buy_digital_book(id_user: int ,id_dBook: int, db: Session = Depends(get_
     if not exist:
         return {"message": "Buy digital book not exist"}
     
-    return BuyBookCreate(**exist.__dict__)
+    return BuyBookOut(**exist.__dict__)
     
 
 #obtener todos los buyBooks
-@router.get("/all_buyBooks/", response_model=list[BuyBookOut])
+@router.get("/all_buyBooks/", response_model=list[BuyBookCreate])
 def get_all_buy_digital_books(db: Session = Depends(get_db)):
     return all_BuyDBooks(db)
 

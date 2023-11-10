@@ -15,7 +15,7 @@ def exist_category(nombre: str, db):
 def all_categories(db):
     return db.query(Categoria).all()
 
-def delete_categories(id: str, db):
+def delete_categories(id: int, db):
     cat = db.query(Categoria).filter(Categoria.id == id).first()
     db.delete(cat)
     db.commit()

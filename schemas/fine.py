@@ -3,10 +3,10 @@ from pydantic import BaseModel
 
 
 class Fine(BaseModel):
-    ValorDeuda: float
-    EstadoFine: int
-    fechaPago: date
+    valorDeuda: int
+    estadoMulta: str
+    fechaDePago: str
     id_prestamo: int
 
 class FineCreate(Fine):
-    id_Fine: int
+    id: int

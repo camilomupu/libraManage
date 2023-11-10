@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from schemas.category import Category
+from schemas.category import Category, CategoryOut
 from config.db import get_db
 from sqlalchemy.orm import Session
 from controllers.category import create_category, exist_category, all_categories, delete_categories
@@ -22,7 +22,7 @@ def get_categoria(nombre: str, db: Session = Depends(get_db)):
     if not exist:
         return {"message": "Categoria not exist"}
     
-    return Category(**exist.__dict__)
+    return CategoryOut(**exist.__dict__)
 
 #obtener todas las categorias
 @router.get("/all_categories/", response_model=list[Category])
@@ -31,7 +31,7 @@ def get_all_categorias(db: Session = Depends(get_db)):
 
 #eliminar categorias por id
 @router.delete("/delete_categories/{id}")
-def delete_categoria(id: str, db: Session = Depends(get_db)):
+def delete_categoria(id: int, db: Session = Depends(get_db)):
     categoriaDeleted = delete_categories(id, db)
     if not categoriaDeleted:
         return {"message": "Categoria not exist"}

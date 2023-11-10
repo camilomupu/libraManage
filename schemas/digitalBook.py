@@ -3,8 +3,7 @@ from pydantic import BaseModel
 class DigitalBookCreate(BaseModel):
     titulo: str
     descripcion: str
-    link_libro: str
-    #link_foto: str
+    linkLibro: str
     precio: float
     id_autor: int
     id_subcategoria: int

@@ -7,3 +7,6 @@ class PhysicalBook(BaseModel):
     id_autor : int
     id_subcategoria : int
     id_categoria : int
+
+class PhysicalBookOut(PhysicalBook):    
+    id: int

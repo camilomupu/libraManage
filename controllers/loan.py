@@ -8,14 +8,14 @@ def create_loan(new_loan: Loan, db):
     db.refresh(loan)
     return loan
 
-def exist_loan(id:str, db):
+def exist_loan(id:int, db):
     loan = db.query(Prestamo).filter(Prestamo.id == id).first()
     return loan
 
 def all_loan(db):
     return db.query(Prestamo).all()
 
-def delete_loan(id: str, db):
+def delete_loan(id: int, db):
     loan = db.query(Prestamo).filter(Prestamo.id == id).first()
     db.delete(loan)
     db.commit()

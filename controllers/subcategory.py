@@ -15,7 +15,7 @@ def exist_subcategory(nombre: str, db):
 def all_subcategories(db):
     return db.query(SubCategoria).all()
 
-def delete_subcategories(id: str, db):
+def delete_subcategories(id: int, db):
     subcategory = db.query(SubCategoria).filter(SubCategoria.id == id).first()
     db.delete(subcategory)
     db.commit()

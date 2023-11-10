@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from schemas.subcategory import SubCategory
+from schemas.subcategory import SubCategory, SubCategoryOut
 from config.db import get_db
 from sqlalchemy.orm import Session
 from controllers.subcategory import create_subcategory, exist_subcategory, all_subcategories, delete_subcategories
@@ -22,7 +22,7 @@ def get_subcategory(nombre: str, db: Session = Depends(get_db)):
     if not exist:
         return {"message": "Subcategoria not exist"}
     
-    return SubCategory(**exist.__dict__)
+    return SubCategoryOut(**exist.__dict__)
 
 #obtener todas las subcategorias
 @router.get("/all_subcategories/", response_model=list[SubCategory])
@@ -31,7 +31,7 @@ def get_all_subcategories(db: Session = Depends(get_db)):
 
 #eliminar subcategorias por id  
 @router.delete("/delete_subcategories/{id}")
-def delete_subcategories(id: str, db: Session = Depends(get_db)):
+def delete_subcategories(id: int, db: Session = Depends(get_db)):
     subcategoriaDeleted = delete_subcategories(id, db)
     if not subcategoriaDeleted:
         return {"message": "Subcategoria not exist"}

@@ -10,14 +10,14 @@ def create_fine(new_fine: FineCreate, db):
     db.refresh(fine)
     return fine
 
-def exist_fine(id_Fine: str, db):
+def exist_fine(id_Fine: int, db):
     fine = db.query(Multa).filter(Multa.id_Fine == id_Fine).first()
     return fine
 
 def all_fines(db):
     return db.query(Multa).all()
 
-def delete_fines(id_Fine: str, db):
+def delete_fines(id_Fine: int, db):
     fine = db.query(Multa).filter(Multa.id_Fine == id_Fine).first()
     db.delete(fine)
     db.commit()

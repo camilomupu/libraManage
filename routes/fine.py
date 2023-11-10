@@ -16,23 +16,23 @@ def create_new_fine(fine: Fine, db: Session = Depends(get_db)):
 
 
 #obtener fine por id_fine
-@router.get("/{id_fine}")
-def get_fine(id_fine: int, db: Session = Depends(get_db)):
-    exist = exist_fine(id_fine, db)
+@router.get("/{id}")
+def get_fine(id: int, db: Session = Depends(get_db)):
+    exist = exist_fine(id, db)
     if not exist:
         return {"message": "Fine not exist"}
     
-    return Fine(**exist.__dict__)
+    return FineCreate(**exist.__dict__)
     
 
 #obtener todos los fines
-@router.get("/all/", response_model=list[FineCreate])
+@router.get("/all/", response_model=list[Fine])
 def get_all_fines(db: Session = Depends(get_db)):
     return all_fines(db)
 
 #eliminar fines por id_fine
 @router.delete("/delete/{id_fine}")
-def delete_fine(id_fine: str, db: Session = Depends(get_db)):
+def delete_fine(id_fine: int, db: Session = Depends(get_db)):
     fineDeleted = delete_fines(id_fine, db)
     if not fineDeleted:
         return {"message": "Fine not exist"}

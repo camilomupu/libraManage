@@ -25,11 +25,11 @@ def get_digital_book(title: str ,id_autor: int, db: Session = Depends(get_db)):
     if not exist:
         return {"message": "Digital book not exist"}
     
-    return DigitalBookCreate(**exist.__dict__)
+    return DBookOut(**exist.__dict__)
     
 
 #obtener todos los digitalBook es
-@router.get("/all_digitalBooks/", response_model=list[DBookOut])
+@router.get("/all_digitalBooks/", response_model=list[DigitalBookCreate])
 def get_all_digital_books(db: Session = Depends(get_db)):
     return all_dBooks(db)
 

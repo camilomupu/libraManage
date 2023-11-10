@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from schemas.author import Author
+from schemas.author import Author, AuthorOut
 from config.db import get_db
 from sqlalchemy.orm import Session
 from controllers.author import create_author, exist_author, all_authors, delete_authors
@@ -22,7 +22,7 @@ def get_author(nombre: str, db: Session = Depends(get_db)):
     if not exist:
         return {"message": "author not exist"}
     
-    return Author(**exist.__dict__)
+    return AuthorOut(**exist.__dict__)
 
 #obtener todas las authors
 @router.get("/all_authors/", response_model=list[Author])

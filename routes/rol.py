@@ -33,7 +33,7 @@ def get_rol(nombre: str, db: Session = Depends(get_db)):
 
 #eliminar roles por id
 @router.delete("/rol/delete/{id}")
-def delete_roles(id: str, db: Session = Depends(get_db)):
+def delete_roles(id: int, db: Session = Depends(get_db)):
     rolDeleted = delete_rol(id, db)
     if not rolDeleted:
         return {"message": "User not exist"}

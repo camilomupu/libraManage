@@ -17,7 +17,7 @@ def exist_user(correo: str, db):
 def all_users(db):
     return db.query(Usuario).all()
 
-def delete_users(id: str, db):
+def delete_users(id: int, db):
     usr = db.query(Usuario).filter(Usuario.id == id).first()
     db.delete(usr)
     db.commit()

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from schemas.physicalBook import PhysicalBook
+from schemas.physicalBook import PhysicalBook, PhysicalBookOut
 from config.db import get_db
 from sqlalchemy.orm import Session
 from controllers.physicalBook import create_physicalBook, exist_physicalBook, all_physicalBook, delete_physicalBook
@@ -22,7 +22,7 @@ def get_physicalBook(titulo: str, db: Session = Depends(get_db)):
     if not exist:
         return {"message": "Physical book not exist"}
     
-    return PhysicalBook(**exist.__dict__)
+    return PhysicalBookOut(**exist.__dict__)
 
 #obtener todos los libros fisicos
 @router.get("/all_physicalBooks/", response_model=list[PhysicalBook])
@@ -31,7 +31,7 @@ def get_all_physicalBook(db: Session = Depends(get_db)):
 
 #eliminar libro fisico por id
 @router.delete("/delete_physicalBook/{id}")
-def delete_physicalBook(id: str, db: Session = Depends(get_db)):
+def delete_physicalBook(id: int, db: Session = Depends(get_db)):
     physicalBookDeleted = delete_physicalBook(id, db)
     if not physicalBookDeleted:
         return {"message": "Physical book not exist"}

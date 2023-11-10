@@ -17,7 +17,7 @@ def exist_rol(rol_nombre: str, db):
 def all_roles(db):
     return db.query(Rol).all()
 
-def delete_rol(id: str, db):
+def delete_rol(id: int, db):
     delRol = db.query(Rol).filter(Rol.id == id).first()
     db.delete(delRol)
     db.commit()
