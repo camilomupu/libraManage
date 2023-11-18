@@ -1,4 +1,0 @@
-# Ignored files and folders
-.env
-.venv/
-__pycache__/

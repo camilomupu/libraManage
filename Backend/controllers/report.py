@@ -2,8 +2,6 @@ from schemas.report import Report
 from models.tables import Informe
 
 def create_report(new_report: Report, db):
-    ## Acá va la logica de consulta en la base de datos
-
     report = Informe(**new_report.dict())
     db.add(report)
     db.commit()

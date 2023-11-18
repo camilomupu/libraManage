@@ -2,7 +2,6 @@ from schemas.user import UserCreate
 from models.tables import Usuario
 
 def create_user(new_user: UserCreate, db):
-
     usr = Usuario(**new_user.dict())
     ## Acá va la logica de consulta en la base de datos
     db.add(usr)

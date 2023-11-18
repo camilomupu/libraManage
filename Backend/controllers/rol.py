@@ -2,8 +2,6 @@ from schemas.rol import RolCreate, RolOut
 from models.tables import Rol
 
 def create_rol(new_rol: RolCreate, db):
-    ## Acá va la logica de consulta en la base de datos
-
     rol = Rol(**new_rol.dict())
     db.add(rol)
     db.commit()
