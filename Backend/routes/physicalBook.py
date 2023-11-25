@@ -12,14 +12,14 @@ router = APIRouter()
 #nuevo libro fisico
 @router.post("/new_physicalBook/")
 def create_new_physicalBook(book: PhysicalBook, db: Session = Depends(get_db)):
-    exist = exist_physicalBook(book.titulo, db)
+    exist = exist_physicalBook(book.titulo, book.id_autor, db)
     if exist:
         return {"message": "Physical book already exist"}
-    if not get_author(book.id_author, db):
+    if not get_author(book.id_autor, db):
         return {"message": "Author not exist"}
-    if not get_category(book.id_category, db):
+    if not get_category(book.id_categoria, db):
         return {"message": "Category not exist"}
-    if not get_subcategory(book.id_subcategory, db):
+    if not get_subcategory(book.id_subcategoria, db):
         return {"message": "Subcategory not exist"}
     new_physicalBook = create_physicalBook(book,db)
     return PhysicalBook(**new_physicalBook.__dict__)

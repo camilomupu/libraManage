@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, Request
 from schemas.buyBook import BuyBookCreate, BuyBookOut
 from config.db import get_db
 from sqlalchemy.orm import Session
-from controllers.buyBook import create_BuyDBooks, exist_BuyDBook, all_BuyDBooks, delete_BuyDBook, get_BuysDBooks
+from controllers.buyBook import create_BuyDBooks, exist_BuyDBook, all_BuyDBooks, delete_BuyDBook, get_BuysDBooks, delete_all_buy_books
 from controllers.digitalBook import get_dBook
 from controllers.user import get_user
 from fastapi.responses import HTMLResponse
@@ -57,3 +57,7 @@ def delete_buy_digital_book(id: int, db: Session = Depends(get_db)):
     if not buyBookDeleted:
         return {"message": "Buy digital book not exist"}
     return {"message": "Buy digital book deleted successfully", "Buy digital book": BuyBookCreate(**buyBookDeleted.__dict__)}
+
+@router.delete("/delete_all_buy_books")
+def delete_all_buy_books_route(db: Session = Depends(get_db)):
+    return delete_all_buy_books(db)

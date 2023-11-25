@@ -21,10 +21,6 @@ def exist_BuyDBook(id_user: int, id_dBook: int, db):
     compLibros = db.query(CompraLibro).filter((CompraLibro.id_usuario == id_user) & (CompraLibro.id_libroDigital == id_dBook)).first()
     return compLibros
 
-def exist_BuyDBook(id_user: int, db):
-    compLibros = db.query(CompraLibro).filter(CompraLibro.id_usuario == id_user)
-    return compLibros
-
 def get_BuysDBooks(id_user: int, db):
     compLibros = db.query(CompraLibro).filter(CompraLibro.id_usuario == id_user )
     return compLibros
@@ -37,4 +33,13 @@ def delete_BuyDBook(id: int, db):
     db.delete(compLibro)
     db.commit()
     return compLibro
+
+def delete_all_buy_books(db):
+    try:
+        db.query(CompraLibro).delete()
+        db.commit()
+        return {"message": "All BuyBook records deleted successfully"}
+    except Exception as e:
+        db.rollback()
+        return {"message": f"An error occurred: {str(e)}"}
 

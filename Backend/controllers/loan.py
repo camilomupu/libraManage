@@ -45,3 +45,12 @@ def delete_loan(id: int, db):
     db.delete(loan)
     db.commit()
     return loan
+
+def delete_all_loans(db):
+    try:
+        db.query(Prestamo).delete()
+        db.commit()
+        return {"message": "All loans deleted successfully"}
+    except Exception as e:
+        db.rollback()
+        return {"message": f"An error occurred: {str(e)}"}
