@@ -1,5 +1,6 @@
 from schemas.digitalBook import DigitalBookCreate
 from models.tables import *
+from sqlalchemy import func
 
 def create_dBook(nuevo_dBook: DigitalBookCreate, db):
 
@@ -11,7 +12,11 @@ def create_dBook(nuevo_dBook: DigitalBookCreate, db):
     return libro
 
 def exist_dBook(title: str, id_autor: int, db):
-    libro = db.query(LibroDigital).filter(LibroDigital.titulo == title and LibroDigital.id_autor == id_autor).first()
+    libro = db.query(LibroDigital).filter((func.upper(LibroDigital.titulo) == title.upper()) & (LibroDigital.id_autor == id_autor)).first()
+    return libro
+
+def get_dBook(id: int, db):
+    libro = db.query(LibroDigital).filter(LibroDigital.id == id).first()
     return libro
 
 def all_dBooks(db):

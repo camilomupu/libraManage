@@ -1,5 +1,6 @@
 from schemas.subcategory import SubCategory
 from models.tables import *
+from sqlalchemy import func
 
 def create_subcategory(new_subcategory: SubCategory, db):
     subcategory = SubCategoria(**new_subcategory.dict())
@@ -9,7 +10,11 @@ def create_subcategory(new_subcategory: SubCategory, db):
     return subcategory
 
 def exist_subcategory(nombre: str, db):
-    subcategory = db.query(SubCategoria).filter(SubCategoria.nombre == nombre).first()
+    subcategory = db.query(SubCategoria).filter(func.upper(SubCategoria.nombre) == nombre.upper()).first()
+    return subcategory
+
+def get_subcategory(id: int, db):
+    subcategory = db.query(SubCategoria).filter(SubCategoria.id == id).first()
     return subcategory
 
 def all_subcategories(db):
