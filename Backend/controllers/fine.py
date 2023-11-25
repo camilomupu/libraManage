@@ -22,3 +22,12 @@ def delete_fines(id_Fine: int, db):
     db.delete(fine)
     db.commit()
     return fine
+
+def delete_all_fines(db):
+    try:
+        db.query(Multa).delete()
+        db.commit()
+        return {"message": "All fines deleted successfully"}
+    except Exception as e:
+        db.rollback()
+        return {"message": f"An error occurred: {str(e)}"}

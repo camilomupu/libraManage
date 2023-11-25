@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from schemas.fine import Fine, FineCreate
 from config.db import get_db
 from sqlalchemy.orm import Session
-from controllers.fine import create_fine, exist_fine, all_fines, delete_fines
+from controllers.fine import create_fine, exist_fine, all_fines, delete_fines, delete_all_fines
 
 
 router = APIRouter()
@@ -37,3 +37,7 @@ def delete_fine(id_fine: int, db: Session = Depends(get_db)):
     if not fineDeleted:
         return {"message": "Fine not exist"}
     return {"message": "Fine deleted successfully", "fine": Fine(**fineDeleted.__dict__)}
+
+@router.delete("/delete_all_fines")
+def delete_all_fines_route(db: Session = Depends(get_db)):
+    return delete_all_fines(db)
