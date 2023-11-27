@@ -4,12 +4,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 import os
-from urllib.parse import urlparse
 import boto3
 from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, File, Request
-#from PIL import Image
-#from io import BytesIO
+
 
 load_dotenv('.env')
 
@@ -20,6 +18,7 @@ db_name = os.getenv('DB_NAME')
 db_port = os.getenv('DB_PORT')
 
 DB_URL = f'postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
+#DB_URL = f'mysql+mysqlconnector://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
 Base = declarative_base()
 engine = create_engine(DB_URL, echo=True, future=True)
 
@@ -42,14 +41,28 @@ s3 = boto3.resource(
 )
 
 
-async def upload_file(file: UploadFile = File(...)):
+async def upload_img(file: UploadFile = File(...)):
+    s3_bucket_name = 'libramanage'
+    folder_name = "imagenes"
+    #Si el nombre tiene un espacio en la mitad se reemplaza por +
+    file_name = file.filename.replace(" ", "+")
+    path = f'{folder_name}/{file_name}'
+    s3.Bucket(s3_bucket_name).put_object(Key= path, Body=file.file)
+    #obtener el url del archivo
+    url = f'https://{s3_bucket_name}.s3.amazonaws.com/{path}'
+    return url
+
+async def upload_pdfs(file: UploadFile = File(...)):
     s3_bucket_name = 'libramanage'
     folder_name = "pdfs"
     #Si el nombre tiene un espacio en la mitad se reemplaza por +
     file_name = file.filename.replace(" ", "+")
     path = f'{folder_name}/{file_name}'
     s3.Bucket(s3_bucket_name).put_object(Key= path, Body=file.file)
-    
     #obtener el url del archivo
     url = f'https://{s3_bucket_name}.s3.amazonaws.com/{path}'
+
     return url
+
+
+

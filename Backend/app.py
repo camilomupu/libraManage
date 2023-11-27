@@ -1,5 +1,5 @@
 from fastapi import FastAPI, File, UploadFile
-from config.db import Base, engine, upload_file
+from config.db import Base, engine
 from routes import user, physicalBook, loan, digitalBook, buyBook, category, subcategory, author, fine, rol, report
 
 Base.metadata.create_all(bind=engine)

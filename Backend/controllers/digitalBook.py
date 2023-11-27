@@ -3,7 +3,6 @@ from models.tables import *
 from sqlalchemy import func, text
 
 def create_dBook(nuevo_dBook: DigitalBookCreate, db):
-
     libro = LibroDigital(**nuevo_dBook.dict())
     ## Acá va la logica de consulta en la base de datos
     db.add(libro)
@@ -31,3 +30,17 @@ def delete_dBook(id: int, db):
     print(max_id)
     db.commit()
     return libro
+
+def exist_user_admin(correo:str, db): #Verificamos si el usuario es administrador
+    user = db.query(Usuario).filter(Usuario.correo == correo).first()
+    if user is None: #Verificamos si el usuario existe
+        return False
+    if user.id_rol is None: #Verificamos si el usuario tiene rol
+        return False
+    rol = db.query(Rol).filter(Rol.id == user.id_rol).first()
+
+    if rol is None: #Verificamos si el rol existe
+        return False
+    if rol.nombre == "Administrador" or rol.nombre == "administrador": #Verificamos si el rol es administrador
+        return True
+    return False

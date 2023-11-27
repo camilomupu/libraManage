@@ -1,15 +1,14 @@
 
-from fastapi import APIRouter, Depends, File, UploadFile, File, Request
-from fastapi.responses import FileResponse
-from typing import List
-import requests
+from fastapi import APIRouter, Depends, File, UploadFile, File, HTTPException
 from schemas.physicalBook import PhysicalBook, PhysicalBookOut
-from config.db import get_db, upload_file
+from config.db import get_db, upload_img
 from sqlalchemy.orm import Session
 from controllers.physicalBook import create_physicalBook, exist_physicalBook, all_physicalBook, delete_physicalBook, exist_user_admin
 from controllers.author import get_author
 from controllers.category import get_category
 from controllers.subcategory import get_subcategory
+
+
 
 router = APIRouter()
 
@@ -51,21 +50,31 @@ def delete_physicalBookk(id: int, db: Session = Depends(get_db)):
     return {"message": "Physical book deleted successfully", 
             "physical book": PhysicalBook(**physicalBookDeleted.__dict__)}
     
+ 
+@router.post("/upload_image/{correo}/")
+async def upload_images(correo:str, file: UploadFile = File(...), db: Session = Depends(get_db)):
+    if not exist_user_admin(correo,db):
+        raise HTTPException(status_code=400, detail="You are not admin")
+    url_archivo_subido = await upload_img(file)
+    return url_archivo_subido
 
-#Ruta para registrar los libros fisicos
-@router.post("/register_physicalBook/")
-async def register_physicalBook(book:PhysicalBook, correo:str, file: UploadFile=File(...), db: Session = Depends(get_db)):
-   
+@router.post("/register_physicalBook/{correo}/{ruta_imagen}/")
+async def register_physicalBook(book:PhysicalBook, correo:str, url_img:str,  db: Session = Depends(get_db)):
     if exist_user_admin(correo,db):
-        exist = exist_physicalBook(book.titulo, db)
+        exist = exist_physicalBook(book.titulo,book.id_autor , db)
         if exist:
-            return {"message": "Physical book already exist"}
-        url_imagen = await upload_file(file)
-        #Asociamos la url de la imagen al libro
-        book.imagen = url_imagen
+            raise HTTPException(status_code=400, detail="Physical book already exist")
+        book.portada = url_img
         new_physicalBook = create_physicalBook(book,db)
         return PhysicalBook(**new_physicalBook.__dict__)
-    return {"message": "You are not admin"}
+    raise HTTPException(status_code=400, detail="You are not admin")
+
+
+
+
+
+
+
 
 
 

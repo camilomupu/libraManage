@@ -5,8 +5,9 @@ from fastapi import UploadFile, File
 class PhysicalBook(BaseModel):
     titulo : str
     descripcion : str
+    portada : str
     ubicacion : str
-    #imagen : UploadFile = File(None)
+    estado : str
     id_autor : int
     id_subcategoria : int
     id_categoria : int
