@@ -1,5 +1,6 @@
 from schemas.report import Report
 from models.tables import Informe
+from sqlalchemy import func, text
 
 def create_report(new_report: Report, db):
     report = Informe(**new_report.dict())
@@ -18,5 +19,9 @@ def all_report(db):
 def delete_report(id: int, db):
     delReport = db.query(Informe).filter(Informe.id == id).first()
     db.delete(delReport)
+    db.commit()
+    max_id = db.query(func.max(Informe.id)).scalar()
+    db.execute(text(f"ALTER SEQUENCE informes_id_seq RESTART WITH {max_id + 1}"))
+    print(max_id)
     db.commit()
     return delReport

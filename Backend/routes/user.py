@@ -1,12 +1,13 @@
 # van a ir todas las rutas relacionadas con el usuario
 from http.client import HTTPException
 from models.tables import Multa
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from schemas.user import User, UserCreate, UserOut
 from config.db import get_db
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from controllers.user import create_user, exist_user, all_users, delete_users, exist_loan, get_associated_fine, exist_user_loan
+from controllers.user import create_user, exist_user, all_users, delete_users, exist_loan, get_associated_fine, exist_user_loan, email_validation, validate_password
+from controllers.email import send_welcome_email
 
 
 router = APIRouter()
@@ -14,11 +15,20 @@ router = APIRouter()
 
 # nuevo usuario
 @router.post("/")
-def create_new_user(usuario: UserCreate, db: Session = Depends(get_db)):
+async def create_new_user(usuario: UserCreate, db: Session = Depends(get_db)):
     exist = exist_user(usuario.correo, db)
     if exist:
         return {"message": "User already exist"}
+    
+    #Comprobamos el correo
+    email_validation(usuario.correo, db)
+    #Comprobamos la contraseña
+    validate_password(usuario.contrasena, db)
     new_user = create_user(usuario, db)
+    
+    # Enviar correo electrónico al usuario
+    await send_welcome_email(new_user.correo, new_user.nombre, Request)
+    
     return User(**new_user.__dict__)
 
 

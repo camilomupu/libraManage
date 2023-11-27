@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, LargeBinary
+from sqlalchemy import Column, Double, Integer, String, ForeignKey, Date, LargeBinary
 from sqlalchemy.orm import relationship
 from config.db import Base
 
@@ -51,7 +51,6 @@ class Categoria(Base):
     __tablename__ = "categorias"
     id = Column(Integer, primary_key=True, autoincrement=True)
     nombre = Column(String(100))
-    descripcion = Column(String(100))
 
     libroDigital = relationship("LibroDigital", back_populates="categoria")
     libroFisico = relationship("LibroFisico", back_populates="categoria")
@@ -82,9 +81,10 @@ class LibroDigital(Base):
     __tablename__ = "librosDigitales"
     id = Column(Integer, primary_key=True, autoincrement=True)
     titulo = Column(String(100))
+    portada = Column(String(100), nullable=False)
+    link_Libro = Column(String(100), nullable=False)
     descripcion = Column(String(100))
-    precio = Column(Integer)
-    linkLibro = Column(String(100))
+    precio = Column(Double)
     id_autor = Column(Integer, ForeignKey("autores.id"))
     id_subcategoria = Column(Integer, ForeignKey("subCategorias.id"))
     id_categoria = Column(Integer, ForeignKey("categorias.id"))
@@ -113,8 +113,10 @@ class LibroFisico(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     titulo = Column(String(100))
     descripcion = Column(String(100))
+    portada = Column(String(100), nullable=False)
     ubicacion = Column(String(100))
     #imagen = Column(LargeBinary, nullable=True)
+    estado = Column(String(100))
     id_autor = Column(Integer, ForeignKey("autores.id"))
     id_subcategoria = Column(Integer, ForeignKey("subCategorias.id"))
     id_categoria = Column(Integer, ForeignKey("categorias.id"))
@@ -131,7 +133,7 @@ class Prestamo(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     fechaPrestamo = Column(Date)
-    fechaVemcimiento = Column(Date)
+    fechaVencimiento = Column(Date)
     id_usuario = Column(Integer, ForeignKey("usuarios.id"))
     id_libroFisico = Column(Integer, ForeignKey("librosFisicos.id"))
 
@@ -144,9 +146,9 @@ class Multa(Base):
     __tablename__ = "multas"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    valorDeuda = Column(Integer)
-    fechaDePago = Column(String(100))
-    estadoMulta = Column(String(100))
+    valorDeuda = Column(Double)
+    fechaDePago = Column(Date)
+    estadoMulta = Column(Integer)
     id_prestamo = Column(Integer, ForeignKey("prestamos.id"))
 
     prestamo = relationship("Prestamo", back_populates="multa")

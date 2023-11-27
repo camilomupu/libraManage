@@ -3,7 +3,7 @@ from config.db import Base, engine, upload_file
 from routes import user, physicalBook, loan, digitalBook, buyBook, category, subcategory, author, fine, rol, report
 
 Base.metadata.create_all(bind=engine)
-# Base.metadata.drop_all(engine) #borra toda la metadata, cuidado
+#Base.metadata.drop_all(engine) #borra toda la metadata, cuidado
 
 app = FastAPI()
 
