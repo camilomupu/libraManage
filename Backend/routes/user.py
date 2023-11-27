@@ -1,9 +1,12 @@
 # van a ir todas las rutas relacionadas con el usuario
+from http.client import HTTPException
+from models.tables import Multa
 from fastapi import APIRouter, Depends
 from schemas.user import User, UserCreate, UserOut
 from config.db import get_db
 from sqlalchemy.orm import Session
-from controllers.user import create_user, exist_user, all_users, delete_users
+from fastapi import HTTPException
+from controllers.user import create_user, exist_user, all_users, delete_users, exist_loan, get_associated_fine, exist_user_loan
 
 
 router = APIRouter()
@@ -45,3 +48,23 @@ def delete_user(id: int, db: Session = Depends(get_db)):
         "message": "User deleted successfully",
         "user": User(**userDeleted.__dict__),
     }
+
+@router.get("/management/fine/{correo}/{id_user}/{id_prestamo}")
+def check_fines_and_deadlines(correo_usuario:str, id_usuario_prestamo: int, id_prestamo: int, db: Session = Depends(get_db)):
+    exist_usr = exist_user(correo_usuario, db)#verificamos si el usuario existe
+    exist_usr_loan = exist_user_loan(id_usuario_prestamo, db)#verificamos si el usuario tiene prestamos
+    exist_loa = exist_loan(id_prestamo, db)#verificamos si el prestamo existe
+    if not exist_usr:
+        raise HTTPException(status_code=404, detail="User not exist")
+    if not exist_usr_loan:
+        raise HTTPException(status_code=404, detail="User has no loans")
+    if not exist_loa:
+        raise HTTPException(status_code=404, detail="Loan not exist")
+
+    multa = get_associated_fine(id_usuario_prestamo, id_prestamo, db)
+
+    if multa is None:
+        raise HTTPException(status_code=404, detail="No fine associated with the user and loan")
+    return {"fine": multa}
+
+

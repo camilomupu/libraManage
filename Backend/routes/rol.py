@@ -18,7 +18,7 @@ def create_new_rol(new_rol: RolCreate, db: Session = Depends(get_db)):
     return rol
 
 #obtener todos los roles
-@router.get("/rol/",response_model=list[RolCreate])
+@router.get("/all_roles/",response_model=list[RolCreate])
 def get_all_roles(db: Session = Depends(get_db)):
     return all_roles(db)
 

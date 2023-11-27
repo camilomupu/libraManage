@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Date
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, LargeBinary
 from sqlalchemy.orm import relationship
 from config.db import Base
 
@@ -114,6 +114,7 @@ class LibroFisico(Base):
     titulo = Column(String(100))
     descripcion = Column(String(100))
     ubicacion = Column(String(100))
+    #imagen = Column(LargeBinary, nullable=True)
     id_autor = Column(Integer, ForeignKey("autores.id"))
     id_subcategoria = Column(Integer, ForeignKey("subCategorias.id"))
     id_categoria = Column(Integer, ForeignKey("categorias.id"))

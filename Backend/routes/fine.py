@@ -16,7 +16,7 @@ def create_new_fine(fine: Fine, db: Session = Depends(get_db)):
 
 
 #obtener fine por id_fine
-@router.get("/{id}")
+@router.get("/fine/{id}")
 def get_fine(id: int, db: Session = Depends(get_db)):
     exist = exist_fine(id, db)
     if not exist:
@@ -26,7 +26,7 @@ def get_fine(id: int, db: Session = Depends(get_db)):
     
 
 #obtener todos los fines
-@router.get("/all/", response_model=list[Fine])
+@router.get("/all_finee/")
 def get_all_fines(db: Session = Depends(get_db)):
     return all_fines(db)
 

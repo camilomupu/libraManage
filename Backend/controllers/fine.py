@@ -11,7 +11,7 @@ def create_fine(new_fine: FineCreate, db):
     return fine
 
 def exist_fine(id_Fine: int, db):
-    fine = db.query(Multa).filter(Multa.id_Fine == id_Fine).first()
+    fine = db.query(Multa).filter(Multa.id == id_Fine).first()
     return fine
 
 def all_fines(db):
