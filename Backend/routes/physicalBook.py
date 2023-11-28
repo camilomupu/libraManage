@@ -3,11 +3,10 @@ from fastapi import APIRouter, Depends, File, UploadFile, File, HTTPException
 from schemas.physicalBook import PhysicalBook, PhysicalBookOut
 from config.db import get_db, upload_img
 from sqlalchemy.orm import Session
-from controllers.physicalBook import create_physicalBook, exist_physicalBook, all_physicalBook, delete_physicalBook, exist_user_admin
+from controllers.physicalBook import create_physicalBook, exist_physicalBook, all_physicalBook, delete_physicalBook, exist_user_admin, search_physical_book
 from controllers.author import get_author
 from controllers.category import get_category
 from controllers.subcategory import get_subcategory
-
 
 
 router = APIRouter()
@@ -69,12 +68,12 @@ async def register_physicalBook(book:PhysicalBook, correo:str, url_img:str,  db:
         return PhysicalBook(**new_physicalBook.__dict__)
     raise HTTPException(status_code=400, detail="You are not admin")
 
-
-
-
-
-
-
-
-
-
+@router.get("/search_physicalBook/")
+def search_physical_book_endpoint(titulo: str = None, categoria: str = None, subcategoria: str = None, 
+                                 autor: str = None, db: Session = Depends(get_db)):
+    
+    physicalBooks = search_physical_book(titulo, categoria, subcategoria, autor, db)
+    if not physicalBooks:
+        return {"message": "No physical books found with the criteria provided"}
+    
+    return physicalBooks 

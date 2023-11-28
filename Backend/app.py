@@ -1,6 +1,6 @@
 from fastapi import FastAPI, File, UploadFile
 from config.db import Base, engine
-from routes import user, physicalBook, loan, digitalBook, buyBook, category, subcategory, author, fine, rol, report
+from routes import user, physicalBook, loan, digitalBook, buyBook, category, subcategory, author, fine, rol, report, book
 
 Base.metadata.create_all(bind=engine)
 #Base.metadata.drop_all(engine) #borra toda la metadata, cuidado
@@ -28,6 +28,8 @@ app.include_router(fine.router, tags=["Fine"])
 app.include_router(rol.router, tags=["Rol"])
 
 app.include_router(report.router, tags=["Report"])
+
+app.include_router(book.router, tags=["Book"])
 
 
 @app.get("/", tags=["Main"])

@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, File, UploadFile, File, HTTPException
 from schemas.digitalBook import DigitalBookCreate, DBookOut
 from config.db import get_db, upload_img, upload_pdfs
 from sqlalchemy.orm import Session
-from controllers.digitalBook  import create_dBook, exist_dBook, all_dBooks, delete_dBook, exist_user_admin
+from controllers.digitalBook  import create_dBook, exist_dBook, all_dBooks, delete_dBook, exist_user_admin, search_digital_book
 
 
 router = APIRouter()
@@ -67,3 +67,13 @@ async def register_digitalBook(book:DigitalBookCreate, correo:str, url_img:str, 
         new_digitalBook = create_dBook(book,db)
         return DigitalBookCreate(**new_digitalBook.__dict__)
     raise HTTPException(status_code=400, detail="You are not admin")
+
+@router.get("/search_digitalBook/")
+def search_digital_book_endpoint(titulo: str = None, categoria: str = None, subcategoria: str = None, 
+                                 autor: str = None, db: Session = Depends(get_db)):
+    
+    digitalBooks = search_digital_book(titulo, categoria, subcategoria, autor, db)
+    if not digitalBooks:
+        return {"message": "No digital books were found with the criteria provided"}
+    
+    return digitalBooks
