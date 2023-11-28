@@ -3,8 +3,8 @@ from pydantic import BaseModel
 
 class Fine(BaseModel):
     valorDeuda: int
-    estadoMulta: str
-    fechaDePago: str
+    estadoMulta: int
+    fechaDePago: date
     id_prestamo: int
 
 class FineCreate(Fine):

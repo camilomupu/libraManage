@@ -133,7 +133,7 @@ async def sendEmaiLoanConfirmation(
     email: str, book: PhysicalBook, loan: loanDueDate, instance: User
 ):
     text_loan_date = loan.fechaPrestamo.strftime("%A, %d de %B de %Y")
-    text_loan_date_end = loan.fechaVemcimiento.strftime("%A, %d de %B de %Y")
+    text_loan_date_end = loan.fechaVencimiento.strftime("%A, %d de %B de %Y")
 
     template = f"""
          <!DOCTYPE html>

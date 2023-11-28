@@ -18,8 +18,22 @@ def exist_fine(id_Fine: int, db):
 def all_fines(db):
     return db.query(Multa).all()
 
+def pay_fine(id_Fine: int, db):
+    fine = db.query(Multa).filter(Multa.id == id_Fine).first()
+    fine.estadoMulta = 1 #NOTA PARA QUE NO SE NOS OLVIDE: 0 es pendiente, 1 es pagada y 2 es perdonada. 
+    db.commit()
+    db.refresh(fine)
+    return fine
+
+def forgive_fine(id_Fine: int, db):
+    fine = db.query(Multa).filter(Multa.id == id_Fine).first()
+    fine.estadoMulta = 2 #NOTA PARA QUE NO SE NOS OLVIDE: 0 es pendiente, 1 es pagada y 2 es perdonada. 
+    db.commit()
+    db.refresh(fine)
+    return fine
+
 def delete_fines(id_Fine: int, db):
-    fine = db.query(Multa).filter(Multa.id_Fine == id_Fine).first()
+    fine = db.query(Multa).filter(Multa.id == id_Fine).first()
     db.delete(fine)
     db.commit()
     max_id = db.query(func.max(Multa.id)).scalar()

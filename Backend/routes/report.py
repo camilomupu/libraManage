@@ -1,9 +1,12 @@
 #van a ir todas las rutas relacionadas con el informe
-from fastapi import APIRouter, Depends
+import io
+from fastapi import APIRouter, Depends, Response
+from http.client import HTTPException
+from fastapi.responses import JSONResponse
 from schemas.report import Report, ReportOut
 from config.db import get_db
 from sqlalchemy.orm import Session
-from controllers.report import create_report, exist_report, all_report, delete_report
+from controllers.report import create_report, exist_report, all_report, delete_report, generate_report, generate_csv_content, generate_xlsx_content, generate_pdf_content, generate_csv_content_by_user, generate_xlsx_content_by_user, generate_pdf_content_by_user
 
 router = APIRouter()
 
@@ -26,6 +29,99 @@ def get_report(id: int, db: Session = Depends(get_db)):
         return {"message": "Report not exist"}
     
     return ReportOut(**exist.__dict__)
+
+#generar reporte
+@router.get("/report/generate/")
+def generate_report_csv(db: Session = Depends(get_db)):
+    return generate_report(db)
+
+@router.get("/report/download-csv/")
+def generate_report_csv(db: Session = Depends(get_db)):
+    report_data = generate_report(db)
+
+    if report_data is None:
+        return JSONResponse(status_code=404, content={"message": "No hay datos para generar el informe"})
+
+    csv_content = generate_csv_content(report_data)
+
+    if csv_content is None:
+        return JSONResponse(status_code=500, content={"message": "Error al generar el informe"})
+
+    return Response(content=csv_content.getvalue(), media_type="text/csv", headers={"Content-Disposition": "attachment; filename=report.csv"})
+
+@router.get("/report/download-csv-all-users/")
+def generate_report_csv(db: Session = Depends(get_db)):
+    report_data = all_report(db)
+
+    if report_data is None:
+        return JSONResponse(status_code=404, content={"message": "No hay datos para generar el informe"})
+
+    csv_content = generate_csv_content_by_user(report_data, db)
+
+    if csv_content is None:
+        return JSONResponse(status_code=500, content={"message": "Error al generar el informe"})
+
+    return Response(content=csv_content.getvalue(), media_type="text/csv", headers={"Content-Disposition": "attachment; filename=report_users.csv"})
+
+#generar xlsx
+@router.get("/report/download-xlsx/")
+def generate_report_xlsx(db: Session = Depends(get_db)):
+    report_data = generate_report(db)
+
+    if report_data is None:
+        return JSONResponse(status_code=404, content={"message": "No hay datos para generar el informe"})
+
+    xlsx_content = generate_xlsx_content(report_data)
+
+    if xlsx_content is None:
+        return JSONResponse(status_code=500, content={"message": "Error al generar el informe"})
+
+    return Response(content=xlsx_content.getvalue(), media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", headers={"Content-Disposition": "attachment; filename=report.xlsx"})
+
+#generar xlsx por usuario
+@router.get("/report/download-xlsx-all-users/")
+def generate_report_xlsx(db: Session = Depends(get_db)):
+    report_data = all_report(db)
+
+    if report_data is None:
+        return JSONResponse(status_code=404, content={"message": "No hay datos para generar el informe"})
+
+    xlsx_content = generate_xlsx_content_by_user(report_data, db)
+
+    if xlsx_content is None:
+        return JSONResponse(status_code=500, content={"message": "Error al generar el informe"})
+
+    return Response(content=xlsx_content.getvalue(), media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", headers={"Content-Disposition": "attachment; filename=report_users.xlsx"})
+
+#generar pdf
+@router.get("/report/download-pdf/")
+def generate_report_pdf(db: Session = Depends(get_db)):
+    report_data = generate_report(db)
+
+    if report_data is None:
+        return JSONResponse(status_code=404, content={"message": "No hay datos para generar el informe"})
+
+    pdf_content = generate_pdf_content(report_data)
+
+    if pdf_content is None:
+        return JSONResponse(status_code=500, content={"message": "Error al generar el informe"})
+
+    return Response(content=pdf_content.getvalue(), media_type="application/pdf", headers={"Content-Disposition": "attachment; filename=report.pdf"})
+
+#generar pdf por usuario
+@router.get("/report/download-pdf-all-users/")
+def generate_report_pdf(db: Session = Depends(get_db)):
+    report_data = all_report(db)
+
+    if report_data is None:
+        return JSONResponse(status_code=404, content={"message": "No hay datos para generar el informe"})
+
+    pdf_content = generate_pdf_content_by_user(report_data, db)
+
+    if pdf_content is None:
+        return JSONResponse(status_code=500, content={"message": "Error al generar el informe"})
+
+    return Response(content=pdf_content.getvalue(), media_type="application/pdf", headers={"Content-Disposition": "attachment; filename=report_users.pdf"})
 
 #eliminar informe por id
 @router.delete("/report/delete/{id}")
