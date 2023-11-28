@@ -1,13 +1,19 @@
 # van a ir todas las rutas relacionadas con el usuario
 from http.client import HTTPException
-from models.tables import Multa
+from models.tables import Multa, Usuario
 from fastapi import APIRouter, Depends, Request
 from schemas.user import User, UserCreate, UserOut
 from config.db import get_db
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from controllers.user import create_user, exist_user, all_users, delete_users, exist_loan, get_associated_fine, exist_user_loan, email_validation, validate_password
+from controllers.user import create_user, exist_user, all_users, delete_users, exist_loan, get_associated_fine, exist_user_loan, email_validation, validate_password, password_context
 from controllers.email import send_welcome_email
+from controllers.hashing import Hasher
+import jwt
+from fastapi import FastAPI, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from schemas.user import UserCreate, UserOut
+
 
 
 router = APIRouter()
@@ -78,3 +84,56 @@ def check_fines_and_deadlines(correo_usuario:str, id_usuario_prestamo: int, id_p
     return {"fine": multa}
 
 
+@router.post("/register_user/")
+async def register(new_user: UserCreate, db: Session = Depends(get_db)):
+    # Validar el correo electrónico
+    email_validation(new_user.correo, db)
+    # Validar la contraseña
+    validate_password(new_user.contrasena, db)
+    # Verificar si el usuario ya existe
+    if exist_user(new_user.correo, db):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="El usuario ya existe"
+        )
+        # Enviar correo electrónico al usuario
+    await send_welcome_email(new_user.correo, new_user.nombre, Request)
+    result = create_user(new_user, db)
+    
+    return {"user": result[0], "token": result[1]}
+
+@router.post("/login_user")
+def login(correo:str, contrasena : str, db: Session = Depends(get_db)):
+    # Validar el correo electrónico
+    email_validation(correo, db)
+    # Verificar si el usuario existe
+    usr = exist_user(correo, db)
+    if not usr:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="El usuario no existe"
+        )
+    # Verificar si la contraseña es correcta
+    if not password_context.verify(contrasena, usr.contrasena):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="La contraseña es incorrecta"
+        )
+    # Crear el token
+    secret_key = "tu_clave_secreta"
+    algorithm = "HS256"
+    payload = {
+        "id": usr.id,
+        "email": usr.correo,
+        "role": usr.id_rol
+    }
+    token = jwt.encode(payload, secret_key, algorithm)
+    #return usr, token
+    return {'message' : 'Ingreso exitoso'}
+
+
+
+
+
+
+    

@@ -1,18 +1,42 @@
+from fastapi.responses import JSONResponse
 from schemas.physicalBook import PhysicalBook
 from fastapi import HTTPException, status
 from pydantic import EmailStr
-from schemas.user import UserCreate
+from schemas.user import UserCreate, UserOut
 from models.tables import Usuario
 from sqlalchemy import func, text
 from models.tables import LibroFisico, Multa, Prestamo, Usuario
+from passlib.context import CryptContext
+from controllers.hashing import Hasher
+import jwt
+from functools import wraps
 
-def create_user(new_user: UserCreate, db):
-    usr = Usuario(**new_user.dict())
+password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+def create_user(new_user: UserOut, db):
+    hashed_password = password_context.hash(new_user.contrasena)
+    #usr = new_user.dict(exclude={'contrasena'})
+    #usr['contrasena']=hashed_password
+    usr = Usuario(**new_user.dict(exclude={'contrasena'}), contrasena=hashed_password)
+
+    #usr = Usuario(**new_user.dict(),contrasena=hashed_password)
     ## Acá va la logica de consulta en la base de datos
     db.add(usr)
     db.commit()
     db.refresh(usr)
-    return usr
+    # Crear el token
+    secret_key = "tu_clave_secreta"
+    algorithm = "HS256"
+    payload = {
+        "id": usr.id,
+        "email": usr.correo,
+        "role": usr.id_rol
+    }
+    token = jwt.encode(payload, secret_key, algorithm)
+    return usr, token
+    #return JSONResponse(content={"user_id": usr.id, "username": usr.username, "email": usr.email})
+
 
 def email_validation(correo: str, db):
     #comprueba que se ingrese un correo electrónico válido y que no sea nulo, lo hace EmailStr
@@ -79,8 +103,9 @@ def exist_user_loan(id_user: int, db):#verificamos si el usuario tiene prestamos
     loan = db.query(Prestamo).filter(Prestamo.id_usuario == id_user).first()
     return loan
 
+def get_user_by_email(email: str, db):
+    return db.query(Usuario).filter(Usuario.correo == email).first()
 
-    
-            
+        
         
 
