@@ -100,7 +100,7 @@ async def register(new_user: UserCreate, db: Session = Depends(get_db)):
     await send_welcome_email(new_user.correo, new_user.nombre, Request)
     result = create_user(new_user, db)
     
-    return {"user": result[0], "token": result[1]}
+    return result
 
 @router.post("/login_user")
 def login(correo:str, contrasena : str, db: Session = Depends(get_db)):
@@ -127,7 +127,7 @@ def login(correo:str, contrasena : str, db: Session = Depends(get_db)):
         "email": usr.correo,
         "role": usr.id_rol
     }
-    token = jwt.encode(payload, secret_key, algorithm)
+    #token = jwt.encode(payload, secret_key, algorithm)
     #return usr, token
     return {'message' : 'Ingreso exitoso'}
 

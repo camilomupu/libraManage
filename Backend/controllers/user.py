@@ -33,8 +33,8 @@ def create_user(new_user: UserOut, db):
         "email": usr.correo,
         "role": usr.id_rol
     }
-    token = jwt.encode(payload, secret_key, algorithm)
-    return usr, token
+    #token = jwt.encode(payload, secret_key, algorithm)
+    return usr
     #return JSONResponse(content={"user_id": usr.id, "username": usr.username, "email": usr.email})
 
 
