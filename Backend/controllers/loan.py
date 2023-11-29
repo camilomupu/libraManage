@@ -7,6 +7,7 @@ def create_loan(new_loan: Loan, db):
     loan = Prestamo(**new_loan.__dict__)
     fechaVencimiento = loan.fechaPrestamo + dt.timedelta(days=3)
     loan.fechaVencimiento = fechaVencimiento
+    loan.devuelto = False
     db.add(loan)
     db.commit()
     db.refresh(loan)
@@ -41,6 +42,41 @@ def check_availabilityToday(id_book: int,db):
 def all_loan(db):
     return db.query(Prestamo).all()
 
+def return_loan_by_book_name_and_date(book_name: str, loan_date: dt.date, db):
+    # Busca el libro físico por su nombre
+    book = db.query(LibroFisico).filter_by(titulo=book_name).first()
+
+    if book:
+        # Busca el préstamo basado en el libro físico y la fecha de préstamo
+        loan = db.query(Prestamo).filter(Prestamo.id_libroFisico == book.id,Prestamo.fechaPrestamo == loan_date).first()
+
+        if loan:
+            if not loan.devuelto:
+                loan.devuelto = True
+                db.commit()
+                return loan
+            else:
+                return None  # El libro ya fue devuelto anteriormente
+        else:
+            return None  # Préstamo no encontrado
+    else:
+        return None  # Libro no encontrado
+
+def return_loan_by_id(id_loan: int, db):
+    # Busca el libro físico por su nombre
+    loan = db.query(LibroFisico).filter_by(id=id_loan).first()
+    
+    if loan:
+        if not loan.devuelto:
+            loan.devuelto = True
+            db.commit()
+            return loan
+        else:
+            return None  # El libro ya fue devuelto anteriormente
+    else:
+        return None  # Préstamo no encontrado
+
+    
 def delete_loan(id: int, db):
     loan = db.query(Prestamo).filter(Prestamo.id == id).first()
     db.delete(loan)
