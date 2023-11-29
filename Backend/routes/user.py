@@ -6,7 +6,7 @@ from schemas.user import User, UserCreate, UserOut
 from config.db import get_db
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from controllers.user import create_user, exist_user, all_users, delete_users, exist_loan, get_associated_fine, exist_user_loan, email_validation, validate_password, password_context
+from controllers.user import create_user, exist_user, all_users, delete_users, exist_loan, get_associated_fine, exist_user_loan, email_validation, validate_password, password_context,exist_token
 from controllers.email import send_welcome_email
 from controllers.hashing import Hasher
 import jwt
@@ -108,7 +108,8 @@ def login(correo:str, contrasena : str, db: Session = Depends(get_db)):
     email_validation(correo, db)
     # Verificar si el usuario existe
     usr = exist_user(correo, db)
-    if not usr:
+    tken = exist_token(correo, db)
+    if not usr or not tken:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="El usuario no existe"
@@ -127,7 +128,7 @@ def login(correo:str, contrasena : str, db: Session = Depends(get_db)):
         "email": usr.correo,
         "role": usr.id_rol
     }
-    #token = jwt.encode(payload, secret_key, algorithm)
+    token = jwt.encode(payload, secret_key, algorithm)
     #return usr, token
     return {'message' : 'Ingreso exitoso'}
 

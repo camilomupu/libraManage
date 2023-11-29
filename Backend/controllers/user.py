@@ -19,12 +19,6 @@ def create_user(new_user: UserOut, db):
     #usr = new_user.dict(exclude={'contrasena'})
     #usr['contrasena']=hashed_password
     usr = Usuario(**new_user.dict(exclude={'contrasena'}), contrasena=hashed_password)
-
-    #usr = Usuario(**new_user.dict(),contrasena=hashed_password)
-    ## Acá va la logica de consulta en la base de datos
-    db.add(usr)
-    db.commit()
-    db.refresh(usr)
     # Crear el token
     secret_key = "tu_clave_secreta"
     algorithm = "HS256"
@@ -33,9 +27,22 @@ def create_user(new_user: UserOut, db):
         "email": usr.correo,
         "role": usr.id_rol
     }
-    #token = jwt.encode(payload, secret_key, algorithm)
-    return usr
-    #return JSONResponse(content={"user_id": usr.id, "username": usr.username, "email": usr.email})
+    token = jwt.encode(payload, secret_key, algorithm)
+    usr.token = token
+    db.add(usr)
+    db.commit()
+    db.refresh(usr)
+    return usr, token
+
+
+def exist_token(correo, db):
+    usr = db.query(Usuario).filter(Usuario.correo == correo).first()
+    if not usr:
+        return False
+    return usr.token
+    
+    
+    
 
 
 def email_validation(correo: str, db):

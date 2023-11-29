@@ -9,6 +9,8 @@ class User(BaseModel):
 
 class UserCreate(User):
     contrasena: str
+    
 
 class UserOut(User):
     id: int
+    token : str
