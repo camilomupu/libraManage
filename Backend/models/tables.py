@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Double, Integer, String, ForeignKey, Date, LargeBinary
+from sqlalchemy import Column, Double, Integer, String, ForeignKey, Date, LargeBinary, Boolean
 from sqlalchemy.orm import relationship
 from config.db import Base
 
@@ -11,6 +11,7 @@ class Usuario(Base):
     nombre = Column(String(100))
     correo = Column(String(100), unique=True)
     contrasena = Column(String(100))
+    token = Column(String(100))
     fechaNacimiento = Column(Date)
     id_rol = Column(Integer, ForeignKey("roles.id"))
 
@@ -134,6 +135,7 @@ class Prestamo(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     fechaPrestamo = Column(Date)
     fechaVencimiento = Column(Date)
+    devuelto = Column(Boolean)
     id_usuario = Column(Integer, ForeignKey("usuarios.id"))
     id_libroFisico = Column(Integer, ForeignKey("librosFisicos.id"))
 
