@@ -65,7 +65,7 @@ def delete_user(id: int, db: Session = Depends(get_db)):
         "user": User(**userDeleted.__dict__),
     }
 
-@router.get("/management/fine/{correo}/{id_user}/{id_prestamo}")
+@router.get("/management_fine/{correo}/{id_user}/{id_prestamo}")
 def check_fines_and_deadlines(correo_usuario:str, id_usuario_prestamo: int, id_prestamo: int, db: Session = Depends(get_db)):
     exist_usr = exist_user(correo_usuario, db)#verificamos si el usuario existe
     exist_usr_loan = exist_user_loan(id_usuario_prestamo, db)#verificamos si el usuario tiene prestamos

@@ -2,6 +2,8 @@ from schemas.physicalBook import PhysicalBook
 from models.tables import *
 from sqlalchemy import func, text
 from sqlalchemy.orm import Session, joinedload
+from fastapi import UploadFile, File
+from config.db import upload_img
 
 def create_physicalBook(new_book: PhysicalBook, db):
     book = LibroFisico(**new_book.__dict__)
@@ -44,6 +46,21 @@ def exist_user_admin(correo:str, db): #Verificamos si el usuario es administrado
     if rol.nombre == "Administrador" or rol.nombre == "administrador": #Verificamos si el rol es administrador
         return True
     return False
+
+async def register_physicalBook(titulo: str, descripcion: str, ubicacion: str, estado: str, id_autor: int,
+                        id_categoria: int, id_subcategoria: int, file: UploadFile = None, url_imagen: str = None):
+    #verificar si se cargo el file
+    if file is not None:
+        url_img = await upload_img(file)
+    else:
+        url_img = url_imagen
+    if url_img is None:
+        raise ValueError("Se requiere una imagen (file o url_imagen) para crear el libro físico.")  
+    
+    new_book = PhysicalBook(titulo=titulo, descripcion=descripcion, portada=url_img, ubicacion=ubicacion,
+                            estado=estado, id_autor=id_autor, id_categoria=id_categoria, id_subcategoria=id_subcategoria)
+    return new_book
+    
 
 def search_physical_book(titulo: str = None, categoria: str = None, subcategoria: str = None, autor: str = None, db: Session = None):
     query = db.query(LibroFisico)
