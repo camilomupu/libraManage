@@ -31,8 +31,8 @@ def get_all_authors(db: Session = Depends(get_db)):
 
 #eliminar authors por id  
 @router.delete("/delete_authors/{id}")
-def delete_authors(id: int, db: Session = Depends(get_db)):
+def delete_authorss(id: int, db: Session = Depends(get_db)):
     authorDeleted = delete_authors(id, db)
     if not authorDeleted:
         return {"message": "author not exist"}
-    return {"message": "author deleted successfully", "author": Author(**authorDeleted.__dict__)}
+    return {"message": "author deleted successfully"}

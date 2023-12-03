@@ -12,7 +12,7 @@ from controllers.subcategory import get_subcategory
 router = APIRouter()
 
 #nuevo libro fisico
-@router.post("/new_physicalBook/")
+"""@router.post("/new_physicalBook/")
 def create_new_physicalBook(book: PhysicalBook, db: Session = Depends(get_db)):
     exist = exist_physicalBook(book.titulo, book.id_autor, db)
     if exist:
@@ -24,7 +24,24 @@ def create_new_physicalBook(book: PhysicalBook, db: Session = Depends(get_db)):
     if not get_subcategory(book.id_subcategoria, db):
         return {"message": "Subcategory not exist"}
     new_physicalBook = create_physicalBook(book,db)
-    return PhysicalBook(**new_physicalBook.__dict__)
+    return PhysicalBook(**new_physicalBook.__dict__)"""
+    
+@router.post("/register_physicalBooks/")
+async def register_physicalBooks(correo:str,titulo:str,descricion:str,ubicacion:str,
+                  estado:str, id_autor:int, id_categoria:int, id_subcategoria:int
+                  , file: UploadFile = None, url_image:str = None, db: Session = Depends(get_db)):
+    if not exist_user_admin(correo,db):
+        raise HTTPException(status_code=400, detail="You are not admin")
+    if file is None and url_image is None:
+        raise HTTPException(status_code=400, detail="You need to upload a file or url_image")
+    exist = exist_physicalBook(titulo, id_autor, db)
+    if exist:
+        raise HTTPException(status_code=400, detail="Physical book already exist")
+    book = await register_physicalBook(titulo,descricion,ubicacion,estado, id_autor, id_categoria, id_subcategoria,file,url_image)
+    
+    new_book = create_physicalBook(book,db)
+    #return PhysicalBook(**new_book.__dict__)
+    return {"message": "Physical book created successfully"}
 
 #obtener libro fisico por titulo
 @router.get("/book/{titulo}/{id_author}")
@@ -57,18 +74,7 @@ async def upload_images(correo:str, file: UploadFile = File(...), db: Session = 
     url_archivo_subido = await upload_img(file)
     return url_archivo_subido
 """
-@router.post("/register_physicalBooks/{correo}/")
-async def register_physicalBooks(correo:str,titulo:str,descricion:str,ubicacion:str,
-                  estado:str, id_autor:int, id_categoria:int, id_subcategoria:int
-                  , file: UploadFile = None, url_image:str = None, db: Session = Depends(get_db)):
-    if not exist_user_admin(correo,db):
-        raise HTTPException(status_code=400, detail="You are not admin")
-    if file is None and url_image is None:
-        raise HTTPException(status_code=400, detail="You need to upload a file or url_image")
-    book = await register_physicalBook(titulo,descricion,ubicacion,estado, id_autor, id_categoria, id_subcategoria,file,url_image)
-    
-    new_book = create_physicalBook(book,db)
-    return PhysicalBook(**new_book.__dict__)
+
     
 
 """

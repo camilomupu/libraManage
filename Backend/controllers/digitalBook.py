@@ -2,6 +2,9 @@ from schemas.digitalBook import DigitalBookCreate
 from models.tables import *
 from sqlalchemy import func, text
 from sqlalchemy.orm import Session
+from fastapi import UploadFile, File
+from config.db import upload_img, upload_pdfs
+from sqlalchemy.exc import NoResultFound
 
 def create_dBook(nuevo_dBook: DigitalBookCreate, db):
     libro = LibroDigital(**nuevo_dBook.dict())
@@ -12,7 +15,7 @@ def create_dBook(nuevo_dBook: DigitalBookCreate, db):
     return libro
 
 def exist_dBook(title: str, id_autor: int, db):
-    libro = db.query(LibroDigital).filter((func.upper(LibroDigital.titulo) == title.upper()) & (LibroDigital.id_autor == id_autor)).first()
+    libro = db.query(LibroDigital).filter((LibroDigital.titulo == title) & (LibroDigital.id_autor == id_autor)).first()
     return libro
 
 def get_dBook(id: int, db):
@@ -23,14 +26,14 @@ def all_dBooks(db):
     return db.query(LibroDigital).all()
 
 def delete_dBook(id: int, db):
-    libro = db.query(LibroDigital).filter(LibroDigital.id == id).first()
-    db.delete(libro)
-    db.commit()
-    max_id = db.query(func.max(LibroDigital.id)).scalar()
-    db.execute(text(f"ALTER SEQUENCE librosDigitales_id_seq RESTART WITH {max_id + 1}"))
-    print(max_id)
-    db.commit()
-    return libro
+    try:
+        libro = db.query(LibroDigital).filter(LibroDigital.id == id).one()
+        db.delete(libro)
+        db.commit()
+        return libro
+    except NoResultFound:
+        db.rollback()
+        return None
 
 def exist_user_admin(correo:str, db): #Verificamos si el usuario es administrador
     user = db.query(Usuario).filter(Usuario.correo == correo).first()
@@ -46,12 +49,33 @@ def exist_user_admin(correo:str, db): #Verificamos si el usuario es administrado
         return True
     return False
 
+async def register_digitalBook(titulo:str,descripcion:str, precio:str, id_autor:int, id_categoria:int, id_subcategoria:int
+                  , file_img: UploadFile = None, file_pdf : UploadFile = None, url_image:str = None,
+                  link_libro:str=None):
+    if file_img is not None:
+        url_img = await upload_img(file_img)
+    else:
+        url_img = url_image
+    if url_img is None:
+        raise ValueError("Se requiere una imagen (file o url_imagen) para crear el libro digital.")
+    if file_pdf is not None:
+        url_pdf = await upload_pdfs(file_pdf)
+    else:
+        url_pdf = link_libro
+    if url_pdf is None:
+        raise ValueError("Se requiere un pdf (file o url_pdf) para crear el libro digital.")
+    
+    new_digitalBook = DigitalBookCreate(titulo=titulo, portada=url_img, link_Libro=url_pdf, descripcion = descripcion,
+                                        precio = precio,id_autor=id_autor, id_subcategoria=id_subcategoria, 
+                                        id_categoria=id_categoria,)
+    return new_digitalBook
+
 def search_digital_book(titulo: str = None, categoria: str = None, subcategoria: str = None, autor: str = None, db: Session = None):
     query = db.query(LibroDigital)
 
     if titulo:
         titulo = titulo.strip()  # Elimina espacios al inicio y al final
-        query = query.filter(func.upper(LibroDigital.titulo).contains(titulo.upper()))
+        query = query.filter(LibroDigital.titulo ==titulo)
     if categoria:
         categoria = categoria.strip()
         query = query.join(Categoria).filter(func.upper(Categoria.nombre) == categoria.upper())

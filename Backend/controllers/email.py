@@ -1,5 +1,6 @@
 import os
 import locale
+from models.tables import *
 from dotenv import load_dotenv
 from fastapi_mail import FastMail, ConnectionConfig, MessageSchema
 from fastapi import Request, HTTPException
@@ -30,9 +31,7 @@ conf = ConnectionConfig(
 )
 
 
-async def sendEmailSaleConfirmation(
-    email: str, book: DigitalBookCreate, instance: User
-):
+async def sendEmailSaleConfirmation(email: str, book: DigitalBookCreate, instance: User):
     template = f"""
         <!DOCTYPE html>
         <html>
@@ -97,7 +96,7 @@ async def sendEmailSaleConfirmation(
                         <p>Gracias por tu compra en nuestra plataforma. Tu compra del libro digital "<strong>{book.titulo}</strong>" ha sido confirmada, 
                         con un valor de $<strong>{book.precio}</strong> pesos.</p>
                         <p>Para descargar tu libro digital, haz clic en el siguiente enlace:</p>
-                        <a href="[Enlace de Descarga]" class="btn">Descargar libro</a>
+                        <a href="{book.link_Libro}" class="btn">Descargar libro</a>
                         <p>Esperamos que disfrutes de tu lectura.</p>
                     <p>Si tienes alguna pregunta o necesitas ayuda, no dudes en contactarnos.</p>
                 </div>

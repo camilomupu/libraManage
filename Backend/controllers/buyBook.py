@@ -30,14 +30,35 @@ def all_BuyDBooks(db):
     return db.query(CompraLibro).all()
 
 def delete_BuyDBook(id: int, db):
-    compLibro = db.query(CompraLibro).filter(CompraLibro.id == id).first()
+    try:
+        compLibro = db.query(CompraLibro).filter(CompraLibro.id == id).first()
+        if compLibro:
+            db.delete(compLibro)
+            db.commit()
+
+            # Obtener el valor máximo actual del id
+            max_id = db.query(func.max(CompraLibro.id)).scalar()
+
+            # Reiniciar la secuencia con el siguiente valor
+            db.execute(text(f"ALTER SEQUENCE compraLibros_id_seq RESTART WITH {max_id + 1}"))
+
+            return compLibro
+        else:
+            return {"message": "CompraLibro not found"}
+    except Exception as e:
+        db.rollback()
+        return {"message": f"An error occurred: {str(e)}"}
+    
+    
+    
+    """compLibro = db.query(CompraLibro).filter(CompraLibro.id == id).first()
     db.delete(compLibro)
     db.commit()
     max_id = db.query(func.max(CompraLibro.id)).scalar()
     db.execute(text(f"ALTER SEQUENCE comprasLibros_id_seq RESTART WITH {max_id + 1}"))
     print(max_id)
     db.commit()
-    return compLibro
+    return compLibro"""
 
 def delete_all_buy_books(db):
     try:
