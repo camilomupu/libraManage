@@ -100,7 +100,8 @@ async def register(new_user: UserCreate, db: Session = Depends(get_db)):
     await send_welcome_email(new_user.correo, new_user.nombre, Request)
     result = create_user(new_user, db)
     
-    return result
+    #return result
+    return {'message' : 'Usuario registrado exitosamente'}
 
 @router.post("/login_user")
 def login(correo:str, contrasena : str, db: Session = Depends(get_db)):

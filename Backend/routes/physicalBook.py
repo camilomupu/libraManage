@@ -27,7 +27,7 @@ def create_new_physicalBook(book: PhysicalBook, db: Session = Depends(get_db)):
     return PhysicalBook(**new_physicalBook.__dict__)"""
     
 @router.post("/register_physicalBooks/")
-async def register_physicalBooks(correo:str,titulo:str,descricion:str,ubicacion:str,
+async def register_physicalBooks(correo:str,titulo:str,descripcion:str,ubicacion:str,
                   estado:str, id_autor:int, id_categoria:int, id_subcategoria:int
                   , file: UploadFile = None, url_image:str = None, db: Session = Depends(get_db)):
     if not exist_user_admin(correo,db):
@@ -37,7 +37,7 @@ async def register_physicalBooks(correo:str,titulo:str,descricion:str,ubicacion:
     exist = exist_physicalBook(titulo, id_autor, db)
     if exist:
         raise HTTPException(status_code=400, detail="Physical book already exist")
-    book = await register_physicalBook(titulo,descricion,ubicacion,estado, id_autor, id_categoria, id_subcategoria,file,url_image)
+    book = await register_physicalBook(titulo,descripcion,ubicacion,estado, id_autor, id_categoria, id_subcategoria,file,url_image)
     
     new_book = create_physicalBook(book,db)
     #return PhysicalBook(**new_book.__dict__)

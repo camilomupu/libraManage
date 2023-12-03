@@ -13,7 +13,7 @@ def create_physicalBook(new_book: PhysicalBook, db):
     return book
 
 def exist_physicalBook(titulo: str, id_author: int, db):
-    book = db.query(LibroFisico).filter((func.upper(LibroFisico.titulo) == titulo.upper()) & (LibroFisico.id_autor == id_author)).first()
+    book = db.query(LibroFisico).filter((LibroFisico.titulo == titulo) & (LibroFisico.id_autor == id_author)).first()
     return book
 
 def get_physicalBook(id: int, db):

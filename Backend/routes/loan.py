@@ -22,13 +22,14 @@ async def create_new_loan(loan: Loan, db: Session = Depends(get_db)):
         return {"message": "This book is not available for this date"}
     bookExist = get_physicalBook(loan.id_libroFisico, db)
     if not bookExist:
-        return {"message": "the digital book does not exist"}
+        return {"message": "the physical book does not exist"}
     userExist = get_user(loan.id_usuario, db)
     if not userExist:
         return {"message": "the user does not exist"}
     new_loan = create_loan(loan,db)
     await sendEmaiLoanConfirmation(userExist.correo, bookExist, new_loan, userExist)
-    return loanDueDate(**new_loan.__dict__)
+    #return loanDueDate(**new_loan.__dict__)
+    return {"message": "Loan created successfully"}
 
 #obtener prestamo por id  
 @router.get("/loan/{id_user}/{id_book}/{date}")
