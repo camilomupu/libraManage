@@ -13,7 +13,7 @@ def create_new_category(categoria: Category, db: Session = Depends(get_db)):
     if exist:
         return {"message": "Categoria already exist"}
     new_categoria = create_category(categoria,db)
-    return Category(**new_categoria.__dict__)
+    return CategoryOut(**new_categoria.__dict__)
 
 #obtener categoria por nombre
 @router.get("/category/{nombre}")
@@ -25,7 +25,7 @@ def get_categoria(nombre: str, db: Session = Depends(get_db)):
     return CategoryOut(**exist.__dict__)
 
 #obtener todas las categorias
-@router.get("/all_categories/", response_model=list[Category])
+@router.get("/all_categories/", response_model=list[CategoryOut])
 def get_all_categorias(db: Session = Depends(get_db)):
     return all_categories(db)
 
