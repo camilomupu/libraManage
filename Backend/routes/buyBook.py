@@ -25,7 +25,8 @@ async def create_new_buy_digital_book(buyBook: BuyBookCreate, db: Session = Depe
         return {"message": "the user does not exist"}
     new_user = create_BuyDBooks(buyBook,db)
     await sendEmailSaleConfirmation(userExist.correo, bookExist, userExist)
-    return BuyBookCreate(**new_user.__dict__)
+    #return BuyBookCreate(**new_user.__dict__)
+    return {"message": "Buy digital book created successfully"}
 
 
 #obtener compra por id del usuario y id del libro digital
@@ -38,12 +39,12 @@ def get_buy_digital_book(id_user: int ,id_dBook: int, db: Session = Depends(get_
     return BuyBookOut(**exist.__dict__)
 
 #obtener compras de un usuario por id del usuario 
-@router.get("/buyBook/{id_user}")
+"""@router.get("/buyBook/{id_user}")
 def get_buy_digital_book(id_user: int, db: Session = Depends(get_db)):
     exist = exist_BuyDBook(id_user, db)
     if not exist:
         return {"message": "this user don buy any digital digital book"}
-    return get_BuysDBooks(id_user, db)
+    return get_BuysDBooks(id_user, db)"""
 
 #obtener todos los buyBooks
 @router.get("/all_buyBooks/", response_model=list[BuyBookCreate])
@@ -56,7 +57,7 @@ def delete_buy_digital_book(id: int, db: Session = Depends(get_db)):
     buyBookDeleted = delete_BuyDBook(id, db)
     if not buyBookDeleted:
         return {"message": "Buy digital book not exist"}
-    return {"message": "Buy digital book deleted successfully", "Buy digital book": BuyBookCreate(**buyBookDeleted.__dict__)}
+    return {"message": "Buy digital book deleted successfully"}
 
 @router.delete("/delete_all_buy_books")
 def delete_all_buy_books_route(db: Session = Depends(get_db)):

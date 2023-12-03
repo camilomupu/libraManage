@@ -12,7 +12,8 @@ router = APIRouter()
 @router.post("/new_fine/")
 def create_new_fine(fine: Fine, db: Session = Depends(get_db)):
     new_fine = create_fine(fine,db)
-    return Fine(**new_fine.__dict__)
+    #return Fine(**new_fine.__dict__)
+    return {"message": "Fine created successfully"}
 
 
 #obtener fine por id_fine
@@ -36,7 +37,7 @@ def pay_fine_route(id_fine: int, db: Session = Depends(get_db)):
     finePaid = pay_fine(id_fine, db)
     if not finePaid:
         return {"message": "Fine not exist"}
-    return {"message": "Fine paid successfully", "fine": Fine(**finePaid.__dict__)}
+    return {"message": "Fine paid successfully"}
 
 #perdonar una multa
 @router.put("/forgive_fine/{id_fine}")
@@ -44,7 +45,7 @@ def forgive_fine_route(id_fine: int, db: Session = Depends(get_db)):
     fineForgiven = forgive_fine(id_fine, db)
     if not fineForgiven:
         return {"message": "Fine not exist"}
-    return {"message": "Fine forgiven successfully", "fine": Fine(**fineForgiven.__dict__)}
+    return {"message": "Fine forgiven successfully"}
 
 #eliminar fines por id_fine
 @router.delete("/delete_fine/{id_fine}")
@@ -52,7 +53,7 @@ def delete_fine(id_fine: int, db: Session = Depends(get_db)):
     fineDeleted = delete_fines(id_fine, db)
     if not fineDeleted:
         return {"message": "Fine not exist"}
-    return {"message": "Fine deleted successfully", "fine": Fine(**fineDeleted.__dict__)}
+    return {"message": "Fine deleted successfully"}
 
 @router.delete("/delete_all_fines")
 def delete_all_fines_route(db: Session = Depends(get_db)):
