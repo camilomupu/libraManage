@@ -3,7 +3,7 @@ from schemas.loan import Loan, LoanOut, loanDueDate
 from config.db import get_db
 from sqlalchemy.orm import Session
 import datetime as dt
-from controllers.loan import create_loan, exist_loan, all_loan, delete_loan, check_availabilityWithDate, check_availabilityToday,delete_all_loans
+from controllers.loan import create_loan, exist_loan, all_loan, delete_loan, check_availabilityWithDate,check_availabilityToday,delete_all_loans, return_loan_by_book_name_and_date,return_loan_by_id
 from controllers.physicalBook import get_physicalBook
 from controllers.user import get_user
 from controllers.email import *
@@ -49,6 +49,22 @@ def get_loan(id_book: int, date: dt.date, db: Session = Depends(get_db)):
 @router.get("/all_loans/", response_model=list[loanDueDate])
 def get_all_loan(db: Session = Depends(get_db)):
     return all_loan(db)
+
+@router.put("/return_loan_by_book_name_and_date/")
+def return_loan_by_book_name_and_date_endpoint(book_name: str, loan_date: dt.date, db: Session = Depends(get_db)):
+    returned_loan = return_loan_by_book_name_and_date(book_name, loan_date, db)
+    if returned_loan:
+        return returned_loan
+    else:
+        return {"message": "Loan not found"}
+    
+@router.put("/return_loan_by_id/")
+def return_loan_by_id_endpoint(book_name: str, loan_date: dt.date, db: Session = Depends(get_db)):
+    returned_loan = return_loan_by_id(book_name, loan_date, db)
+    if returned_loan:
+        return returned_loan
+    else:
+        return {"message": "Loan not found"}
 
 #eliminar prestamo por id
 @router.delete("/delete_loan/{id}")

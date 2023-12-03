@@ -8,6 +8,7 @@ class Loan(BaseModel):
     
 class loanDueDate(Loan):
     fechaVencimiento : date
+    devuelto : bool
 
 class LoanOut(loanDueDate):
     id : int
