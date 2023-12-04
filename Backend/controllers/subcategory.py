@@ -25,7 +25,7 @@ def delete_subcategories(id: int, db):
     db.delete(subcategory)
     db.commit()
     max_id = db.query(func.max(SubCategoria.id)).scalar()
-    db.execute(text(f"ALTER SEQUENCE subCategorias_id_seq RESTART WITH {max_id + 1}"))
+    db.execute(text(f"ALTER SEQUENCE subcategorias_id_seq RESTART WITH {max_id + 1}"))
     print(max_id)
     db.commit()
     return subcategory

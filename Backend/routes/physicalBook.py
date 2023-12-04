@@ -53,7 +53,7 @@ def get_physicalBook(titulo: str, id_author: int, db: Session = Depends(get_db))
     return PhysicalBookOut(**exist.__dict__)
 
 #obtener todos los libros fisicos
-@router.get("/all_physicalBooks/", response_model=list[PhysicalBook])
+@router.get("/all_physicalBooks/", response_model=list[PhysicalBookOut])
 def get_all_physicalBook(db: Session = Depends(get_db)):
     return all_physicalBook(db)
 

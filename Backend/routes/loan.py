@@ -47,7 +47,7 @@ def get_loan(id_book: int, date: dt.date, db: Session = Depends(get_db)):
     return exist
 
 #obtener todos los prestamos
-@router.get("/all_loans/", response_model=list[loanDueDate])
+@router.get("/all_loans/", response_model=list[LoanOut])
 def get_all_loan(db: Session = Depends(get_db)):
     return all_loan(db)
 
@@ -60,8 +60,8 @@ def return_loan_by_book_name_and_date_endpoint(book_name: str, loan_date: dt.dat
         return {"message": "Loan not found"}
     
 @router.put("/return_loan_by_id/")
-def return_loan_by_id_endpoint(book_name: str, loan_date: dt.date, db: Session = Depends(get_db)):
-    returned_loan = return_loan_by_id(book_name, loan_date, db)
+def return_loan_by_id_endpoint(id_loan:int, db: Session = Depends(get_db)):
+    returned_loan = return_loan_by_id(id_loan, db)
     if returned_loan:
         return returned_loan
     else:

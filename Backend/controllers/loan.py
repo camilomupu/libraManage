@@ -64,7 +64,7 @@ def return_loan_by_book_name_and_date(book_name: str, loan_date: dt.date, db):
 
 def return_loan_by_id(id_loan: int, db):
     # Busca el libro físico por su nombre
-    loan = db.query(LibroFisico).filter_by(id=id_loan).first()
+    loan = db.query(Prestamo).filter(Prestamo.id == id_loan).first()
     
     if loan:
         if not loan.devuelto:
