@@ -9,7 +9,7 @@ from routes.user import Portador
 router = APIRouter()
 
 #nueva author
-@router.post("/new_author/", dependencies=[Depends(Portador())])
+@router.post("/new_author/")
 def create_new_author(author: Author, db: Session = Depends(get_db)):
     exist = exist_author(author.nombre, db)
     if exist:
@@ -27,12 +27,12 @@ def get_author(nombre: str, db: Session = Depends(get_db)):
     return AuthorOut(**exist.__dict__)
 
 #obtener todas las authors
-@router.get("/all_authors/", response_model=list[Author], dependencies=[Depends(Portador())])
+@router.get("/all_authors/", response_model=list[AuthorOut])
 def get_all_authors(db: Session = Depends(get_db)):
     return all_authors(db)
 
 #eliminar authors por id  
-@router.delete("/delete_authors/{id}", dependencies=[Depends(Portador())])
+@router.delete("/delete_authors/{id}")
 def delete_authorss(id: int, db: Session = Depends(get_db)):
     authorDeleted = delete_authors(id, db)
     if not authorDeleted:

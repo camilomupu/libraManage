@@ -8,7 +8,7 @@ from routes.user import Portador
 router = APIRouter()
 
 #nueva categoria
-@router.post("/new_category/", dependencies=[Depends(Portador())])
+@router.post("/new_category/")
 def create_new_category(categoria: Category, db: Session = Depends(get_db)):
     exist = exist_category(categoria.nombre, db)
     if exist:
@@ -31,7 +31,7 @@ def get_all_categorias(db: Session = Depends(get_db)):
     return all_categories(db)
 
 #eliminar categorias por id
-@router.delete("/delete_categories/{id}", dependencies=[Depends(Portador())])
+@router.delete("/delete_categories/{id}")
 def delete_categoria(id: int, db: Session = Depends(get_db)):
     categoriaDeleted = delete_categories(id, db)
     if not categoriaDeleted:
