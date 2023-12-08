@@ -4,8 +4,8 @@ from routes import user, physicalBook, loan, digitalBook, buyBook, category, sub
 
 Base.metadata.create_all(bind=engine)
 #Base.metadata.drop_all(engine) #borra toda la metadata, cuidado
-
-app = FastAPI()
+#colocar nombre
+app = FastAPI(title="Libra Tech", description="API para el manejo de una biblioteca", version="1.0.0")
 
 app.include_router(user.router, tags=["User"])
 

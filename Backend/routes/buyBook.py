@@ -8,11 +8,12 @@ from controllers.digitalBook import get_dBook
 from controllers.user import get_user
 from fastapi.responses import HTMLResponse
 from controllers.email import *
+from routes.user import Portador
 
 router = APIRouter()
 
 #nuevo buyBook pruebas
-@router.post("/new_buyBook/")
+@router.post("/new_buyBook/", dependencies=[Depends(Portador())])
 async def create_new_buy_digital_book(buyBook: BuyBookCreate, db: Session = Depends(get_db)):
     buyExist = exist_BuyDBook(buyBook.id_usuario, buyBook.id_libroDigital, db)
     if buyExist:
@@ -30,7 +31,7 @@ async def create_new_buy_digital_book(buyBook: BuyBookCreate, db: Session = Depe
 
 
 #obtener compra por id del usuario y id del libro digital
-@router.get("/buyBook/{id_user}/{id_dBook}")
+@router.get("/buyBook/{id_user}/{id_dBook}", dependencies=[Depends(Portador())])
 def get_buy_digital_book(id_user: int ,id_dBook: int, db: Session = Depends(get_db)):
     exist = exist_BuyDBook(id_user, id_dBook, db)
     if not exist:
@@ -38,27 +39,19 @@ def get_buy_digital_book(id_user: int ,id_dBook: int, db: Session = Depends(get_
     
     return BuyBookOut(**exist.__dict__)
 
-#obtener compras de un usuario por id del usuario 
-"""@router.get("/buyBook/{id_user}")
-def get_buy_digital_book(id_user: int, db: Session = Depends(get_db)):
-    exist = exist_BuyDBook(id_user, db)
-    if not exist:
-        return {"message": "this user don buy any digital digital book"}
-    return get_BuysDBooks(id_user, db)"""
-
 #obtener todos los buyBooks
 @router.get("/all_buyBooks/", response_model=list[BuyBookCreate])
 def get_all_buy_digital_books(db: Session = Depends(get_db)):
     return all_BuyDBooks(db)
 
 #eliminar buyBooks por id
-@router.delete("/delete_buyBook/{id}")
+@router.delete("/delete_buyBook/{id}", dependencies=[Depends(Portador())])
 def delete_buy_digital_book(id: int, db: Session = Depends(get_db)):
     buyBookDeleted = delete_BuyDBook(id, db)
     if not buyBookDeleted:
         return {"message": "Buy digital book not exist"}
     return {"message": "Buy digital book deleted successfully"}
 
-@router.delete("/delete_all_buy_books")
+@router.delete("/delete_all_buy_books", dependencies=[Depends(Portador())])
 def delete_all_buy_books_route(db: Session = Depends(get_db)):
     return delete_all_buy_books(db)

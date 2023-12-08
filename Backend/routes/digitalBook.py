@@ -4,20 +4,11 @@ from schemas.digitalBook import DigitalBookCreate, DBookOut
 from config.db import get_db, upload_img, upload_pdfs
 from sqlalchemy.orm import Session
 from controllers.digitalBook  import create_dBook, exist_dBook, all_dBooks, delete_dBook, exist_user_admin, search_digital_book, register_digitalBook
-
+from routes.user import Portador
 
 router = APIRouter()
-
-#nuevo digitalBook 
-"""@router.post("/new_digitalBook/")
-def create_new_digital_book(digitalBook : DigitalBookCreate, db: Session = Depends(get_db)):
-    exist = exist_dBook(digitalBook .titulo, digitalBook .id_autor, db)
-    if exist:
-        return {"message": "Digital book already exist"}
-    new_user = create_dBook(digitalBook ,db)
-    return DigitalBookCreate(**new_user.__dict__)"""
     
-@router.post("/register_digitalBooks/")
+@router.post("/register_digitalBooks/", dependencies=[Depends(Portador())])
 async def register_digitalBooks(correo:str,titulo:str,descripcion:str, precio:str, id_autor:int, id_categoria:int, id_subcategoria:int
                   , file_img: UploadFile = None, file_pdf : UploadFile = None, url_image:str = None, link_libro:str=None,  db: Session = Depends(get_db)):
     if not exist_user_admin(correo,db):
@@ -37,7 +28,7 @@ async def register_digitalBooks(correo:str,titulo:str,descripcion:str, precio:st
 
 
 #obtener digitalBook  por correo
-@router.get("/digitalBook/{title}/{id_autor}")
+@router.get("/digitalBook/{title}/{id_autor}", dependencies=[Depends(Portador())])
 def get_digital_book(title: str ,id_autor: int, db: Session = Depends(get_db)):
     exist = exist_dBook(title, id_autor, db)
     if not exist:
@@ -52,28 +43,12 @@ def get_all_digital_books(db: Session = Depends(get_db)):
     return all_dBooks(db)
 
 #eliminar digitalBook es por id
-@router.delete("/delete_digitalBook/{id}")
+@router.delete("/delete_digitalBook/{id}", dependencies=[Depends(Portador())])
 def delete_digital_book(id: int, db: Session = Depends(get_db)):
     digitalBookDeleted = delete_dBook(id, db)
     if not digitalBookDeleted:
         return {"message": "Digital book not exist"}
     return {"message": "Digital book deleted successfully"}
-
-
-"""@router.post("/upload_img_digitalBook/{correo}/")
-async def upload_images_dBook(correo:str, file: UploadFile = File(...), db: Session = Depends(get_db)):
-    if not exist_user_admin(correo,db):
-        raise HTTPException(status_code=400, detail="You are not admin")
-    url_archivo_subido = await upload_img(file)
-    return url_archivo_subido
-
-@router.post("/upload_pdf_book/{correo}/")
-async def upload_files(correo:str, file: UploadFile = File(...), db: Session = Depends(get_db)):
-    if not exist_user_admin(correo,db):
-        raise HTTPException(status_code=400, detail="You are not admin")
-    url_archivo_subido = await upload_pdfs(file)
-    return url_archivo_subido"""
-
 
 
 @router.get("/search_digitalBook/")

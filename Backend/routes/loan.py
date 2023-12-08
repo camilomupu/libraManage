@@ -7,12 +7,12 @@ from controllers.loan import create_loan, exist_loan, all_loan, delete_loan, che
 from controllers.physicalBook import get_physicalBook
 from controllers.user import get_user
 from controllers.email import *
-
+from routes.user import Portador
 
 router = APIRouter()
 
 #nuevo prestamo
-@router.post("/new_loan/")
+@router.post("/new_loan/", dependencies=[Depends(Portador())])
 async def create_new_loan(loan: Loan, db: Session = Depends(get_db)):
     exist = exist_loan(loan.id_usuario, loan.id_libroFisico, loan.fechaPrestamo, db)
     if exist:
@@ -31,14 +31,14 @@ async def create_new_loan(loan: Loan, db: Session = Depends(get_db)):
     return loanDueDate(**new_loan.__dict__)
 
 #obtener prestamo por id  
-@router.get("/loan/{id_user}/{id_book}/{date}")
+@router.get("/loan/{id_user}/{id_book}/{date}", dependencies=[Depends(Portador())])
 def get_loan(id_user: int, id_book: int, date_loan: dt.date, db: Session = Depends(get_db)):
     exist = exist_loan(id_user, id_book, date_loan, db)
     if not exist:
         return {"message": "Loan not exist"}
     return exist
 
-@router.get("/check_availability/{id_book}/{date}")
+@router.get("/check_availability/{id_book}/{date}", dependencies=[Depends(Portador())])
 def get_loan(id_book: int, date: dt.date, db: Session = Depends(get_db)):
     exist = check_availabilityWithDate(id_book, date, db)
     if not exist:
@@ -46,11 +46,11 @@ def get_loan(id_book: int, date: dt.date, db: Session = Depends(get_db)):
     return exist
 
 #obtener todos los prestamos
-@router.get("/all_loans/", response_model=list[loanDueDate])
+@router.get("/all_loans/", response_model=list[loanDueDate], dependencies=[Depends(Portador())])
 def get_all_loan(db: Session = Depends(get_db)):
     return all_loan(db)
 
-@router.put("/return_loan_by_book_name_and_date/")
+@router.put("/return_loan_by_book_name_and_date/", dependencies=[Depends(Portador())])
 def return_loan_by_book_name_and_date_endpoint(book_name: str, loan_date: dt.date, db: Session = Depends(get_db)):
     returned_loan = return_loan_by_book_name_and_date(book_name, loan_date, db)
     if returned_loan:
@@ -58,7 +58,7 @@ def return_loan_by_book_name_and_date_endpoint(book_name: str, loan_date: dt.dat
     else:
         return {"message": "Loan not found"}
     
-@router.put("/return_loan_by_id/")
+@router.put("/return_loan_by_id/", dependencies=[Depends(Portador())])
 def return_loan_by_id_endpoint(book_name: str, loan_date: dt.date, db: Session = Depends(get_db)):
     returned_loan = return_loan_by_id(book_name, loan_date, db)
     if returned_loan:
@@ -67,13 +67,13 @@ def return_loan_by_id_endpoint(book_name: str, loan_date: dt.date, db: Session =
         return {"message": "Loan not found"}
 
 #eliminar prestamo por id
-@router.delete("/delete_loan/{id}")
+@router.delete("/delete_loan/{id}", dependencies=[Depends(Portador())])
 def delete_loan_id(id:int, db:Session = Depends(get_db)):
     loanDeleted = delete_loan(id, db)
     if not loanDeleted:
         return {"message": "Loan not exist"}
     return {"message": "Loan deleted successfully", "loan": Loan(**loanDeleted.__dict__)}
 
-@router.delete("/delete_all_loans")
+@router.delete("/delete_all_loans", dependencies=[Depends(Portador())])
 def delete_all_loans_route(db: Session = Depends(get_db)):
     return delete_all_loans(db)
