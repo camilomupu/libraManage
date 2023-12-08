@@ -4,11 +4,12 @@ from schemas.rol import RolCreate, RolOut
 from config.db import get_db
 from sqlalchemy.orm import Session
 from controllers.rol import create_rol, exist_rol, all_roles, delete_rol
+from routes.user import Portador
 
 router = APIRouter()
 
 #crear rol
-@router.post("/rolcreate/")
+@router.post("/rolcreate/", dependencies=[Depends(Portador())])
 def create_new_rol(new_rol: RolCreate, db: Session = Depends(get_db)):
     exist = exist_rol(new_rol.nombre, db)
     if exist:
@@ -18,12 +19,12 @@ def create_new_rol(new_rol: RolCreate, db: Session = Depends(get_db)):
     return rol
 
 #obtener todos los roles
-@router.get("/all_roles/",response_model=list[RolOut])
+@router.get("/all_roles/",response_model=list[RolOut], dependencies=[Depends(Portador())])
 def get_all_roles(db: Session = Depends(get_db)):
     return all_roles(db)
 
 #obtener rol por nombre
-@router.get("/rol/{nombre}")
+@router.get("/rol/{nombre}", dependencies=[Depends(Portador())])
 def get_rol(nombre: str, db: Session = Depends(get_db)):
     exist = exist_rol(nombre, db)
     if not exist:
@@ -32,7 +33,7 @@ def get_rol(nombre: str, db: Session = Depends(get_db)):
     return RolOut(**exist.__dict__)
 
 #eliminar roles por id
-@router.delete("/rol/delete/{id}")
+@router.delete("/rol/delete/{id}", dependencies=[Depends(Portador())])
 def delete_roles(id: int, db: Session = Depends(get_db)):
     rolDeleted = delete_rol(id, db)
     if not rolDeleted:

@@ -9,6 +9,7 @@ from models.tables import LibroFisico, Multa, Prestamo, Usuario
 from passlib.context import CryptContext
 from controllers.hashing import Hasher
 import jwt
+from jwt import encode, decode
 from functools import wraps
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -32,18 +33,21 @@ def create_user(new_user: UserOut, db):
     db.add(usr)
     db.commit()
     db.refresh(usr)
-    return usr, token
+    return usr.token
+
+def validar_token(token:str)->dict:
+    dato:dict = decode(token, "tu_clave_secreta", algorithms=["HS256"])
+    
+    return dato
+
+        
 
 
-def exist_token(correo, db):
-    usr = db.query(Usuario).filter(Usuario.correo == correo).first()
+def exist_token(correo:str, contrasena:str,  db):
+    usr = db.query(Usuario).filter(Usuario.correo == correo and Usuario.contrasena == contrasena).first()
     if not usr:
         return False
     return usr.token
-    
-    
-    
-
 
 def email_validation(correo: str, db):
     #comprueba que se ingrese un correo electrónico válido y que no sea nulo, lo hace EmailStr
