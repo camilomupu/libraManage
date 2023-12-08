@@ -22,13 +22,14 @@ async def create_new_loan(loan: Loan, db: Session = Depends(get_db)):
         return {"message": "This book is not available for this date"}
     bookExist = get_physicalBook(loan.id_libroFisico, db)
     if not bookExist:
-        return {"message": "the digital book does not exist"}
+        return {"message": "the physical book does not exist"}
     userExist = get_user(loan.id_usuario, db)
     if not userExist:
         return {"message": "the user does not exist"}
     new_loan = create_loan(loan,db)
     await sendEmaiLoanConfirmation(userExist.correo, bookExist, new_loan, userExist)
-    return loanDueDate(**new_loan.__dict__)
+    #return loanDueDate(**new_loan.__dict__)
+    return {"message": "Loan created successfully"}
 
 #obtener prestamo por id  
 @router.get("/loan/{id_user}/{id_book}/{date}", dependencies=[Depends(Portador())])
@@ -46,7 +47,7 @@ def get_loan(id_book: int, date: dt.date, db: Session = Depends(get_db)):
     return exist
 
 #obtener todos los prestamos
-@router.get("/all_loans/", response_model=list[loanDueDate], dependencies=[Depends(Portador())])
+@router.get("/all_loans/", response_model=list[LoanOut], dependencies=[Depends(Portador())])
 def get_all_loan(db: Session = Depends(get_db)):
     return all_loan(db)
 
@@ -59,8 +60,8 @@ def return_loan_by_book_name_and_date_endpoint(book_name: str, loan_date: dt.dat
         return {"message": "Loan not found"}
     
 @router.put("/return_loan_by_id/", dependencies=[Depends(Portador())])
-def return_loan_by_id_endpoint(book_name: str, loan_date: dt.date, db: Session = Depends(get_db)):
-    returned_loan = return_loan_by_id(book_name, loan_date, db)
+def return_loan_by_id_endpoint(id_loan:int, db: Session = Depends(get_db)):
+    returned_loan = return_loan_by_id(id_loan, db)
     if returned_loan:
         return returned_loan
     else:

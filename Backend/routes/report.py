@@ -16,7 +16,8 @@ router = APIRouter()
 @router.post("/reportcreate/", dependencies=[Depends(Portador())])
 def create_new_report(new_report: Report, db: Session = Depends(get_db)):
     report = create_report(new_report, db)
-    return report
+    #return report
+    return {"message": "Reporte created successfully"}
 
 #obtener todos los informes
 @router.get("/report/",response_model=list[Report], dependencies=[Depends(Portador())])

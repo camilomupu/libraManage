@@ -14,7 +14,7 @@ router = APIRouter()
 
     
 @router.post("/register_physicalBooks/", dependencies=[Depends(Portador())])
-async def register_physicalBooks(correo:str,titulo:str,descricion:str,ubicacion:str,
+async def register_physicalBooks(correo:str,titulo:str,descripcion:str,ubicacion:str,
                   estado:str, id_autor:int, id_categoria:int, id_subcategoria:int
                   , file: UploadFile = None, url_image:str = None, db: Session = Depends(get_db)):
     if not exist_user_admin(correo,db):
@@ -24,7 +24,7 @@ async def register_physicalBooks(correo:str,titulo:str,descricion:str,ubicacion:
     exist = exist_physicalBook(titulo, id_autor, db)
     if exist:
         raise HTTPException(status_code=400, detail="Physical book already exist")
-    book = await register_physicalBook(titulo,descricion,ubicacion,estado, id_autor, id_categoria, id_subcategoria,file,url_image)
+    book = await register_physicalBook(titulo,descripcion,ubicacion,estado, id_autor, id_categoria, id_subcategoria,file,url_image)
     
     new_book = create_physicalBook(book,db)
     #return PhysicalBook(**new_book.__dict__)
@@ -40,7 +40,7 @@ def get_physicalBook(titulo: str, id_author: int, db: Session = Depends(get_db))
     return PhysicalBookOut(**exist.__dict__)
 
 #obtener todos los libros fisicos
-@router.get("/all_physicalBooks/", response_model=list[PhysicalBook])
+@router.get("/all_physicalBooks/", response_model=list[PhysicalBookOut])
 def get_all_physicalBook(db: Session = Depends(get_db)):
     return all_physicalBook(db)
 

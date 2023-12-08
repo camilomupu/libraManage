@@ -32,6 +32,10 @@ async def register(new_user: UserCreate, db: Session = Depends(get_db)):
         )
         # Enviar correo electrónico al usuario
     await send_welcome_email(new_user.correo, new_user.nombre, Request)
+    result = create_user(new_user, db)
+    
+    #return result
+    return {'message' : 'Usuario registrado exitosamente'}
     token = create_user(new_user, db)
     return token
 

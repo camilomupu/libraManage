@@ -15,7 +15,8 @@ def create_new_subcategory(subcategoria: SubCategory, db: Session = Depends(get_
     if exist:
         return {"message": "Subcategoria already exist"}
     new_subcategoria = create_subcategory(subcategoria,db)
-    return SubCategory(**new_subcategoria.__dict__)
+    #return SubCategory(**new_subcategoria.__dict__)
+    return {"message": "Subcategoria created successfully"}
 
 #obtener subcategoria por nombre
 @router.get("/subcategory/{nombre}", dependencies=[Depends(Portador())])
@@ -27,12 +28,12 @@ def get_subcategory(nombre: str, db: Session = Depends(get_db)):
     return SubCategoryOut(**exist.__dict__)
 
 #obtener todas las subcategorias
-@router.get("/all_subcategories/", response_model=list[SubCategory], dependencies=[Depends(Portador())])
+@router.get("/all_subcategories/", response_model=list[SubCategoryOut], dependencies=[Depends(Portador())])
 def get_all_subcategories(db: Session = Depends(get_db)):
     return all_subcategories(db)
 
 #eliminar subcategorias por id  
-@router.delete("/delete_subcategories/{id}", dependencies=[Depends(Portador())])
+@router.delete("/delete_subcategories/{id}")
 def delete_subcategories(id: int, db: Session = Depends(get_db)):
     subcategoriaDeleted = delete_subcategories(id, db)
     if not subcategoriaDeleted:
