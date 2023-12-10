@@ -28,7 +28,7 @@ def get_subcategory(nombre: str, db: Session = Depends(get_db)):
     return SubCategoryOut(**exist.__dict__)
 
 #obtener todas las subcategorias
-@router.get("/all_subcategories/", response_model=list[SubCategoryOut], dependencies=[Depends(Portador())])
+@router.get("/all_subcategories/", response_model=list[SubCategoryOut])
 def get_all_subcategories(db: Session = Depends(get_db)):
     return all_subcategories(db)
 

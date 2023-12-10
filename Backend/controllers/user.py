@@ -1,6 +1,6 @@
 from fastapi.responses import JSONResponse
 from schemas.physicalBook import PhysicalBook
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Depends
 from pydantic import EmailStr
 from schemas.user import UserCreate, UserOut
 from models.tables import Usuario
@@ -8,6 +8,7 @@ from sqlalchemy import func, text
 from models.tables import LibroFisico, Multa, Prestamo, Usuario
 from passlib.context import CryptContext
 from controllers.hashing import Hasher
+
 import jwt
 from jwt import encode, decode
 from functools import wraps
@@ -91,7 +92,7 @@ def get_user(id: int, db):
 def all_users(db):
     return db.query(Usuario).all()
 
-def delete_users(id: int, db):
+"""def delete_users(id: int, db):
     # Obtiene el valor del id antes de eliminar el registro
     usr = db.query(Usuario).filter(Usuario.id == id).first()
     db.delete(usr)
@@ -100,7 +101,21 @@ def delete_users(id: int, db):
     db.execute(text(f"ALTER SEQUENCE usuarios_id_seq RESTART WITH {max_id + 1}"))
     print(max_id)
     db.commit()
+    return usr"""
+def delete_users(id: int, db):
+    # Obtiene el valor del id antes de eliminar el registro
+    usr = db.query(Usuario).filter(Usuario.id == id).first()
+    if not usr:
+        print("El usuario no existe en la base de datos.")
+        return None
+    db.delete(usr)
+    db.commit()
+    max_id = db.query(func.max(Usuario.id)).scalar()
+    db.execute(text(f"ALTER SEQUENCE usuarios_id_seq RESTART WITH {max_id + 1}"))
+    print(max_id)
+    db.commit()
     return usr
+
 
 def exist_loan(id: int, db):#verificamos si el prestamo existe
     loan = db.query(Prestamo).filter(Prestamo.id == id).first()

@@ -32,10 +32,10 @@ async def register(new_user: UserCreate, db: Session = Depends(get_db)):
         )
         # Enviar correo electrónico al usuario
     await send_welcome_email(new_user.correo, new_user.nombre, Request)
-    result = create_user(new_user, db)
+    #result = create_user(new_user, db)
     
     #return result
-    return {'message' : 'Usuario registrado exitosamente'}
+    #return {'message' : 'Usuario registrado exitosamente'}
     token = create_user(new_user, db)
     return token
 
@@ -70,14 +70,29 @@ def login(correo: str, contrasena: str, db: Session = Depends(get_db)):
 #Para la validacion del token
 class Portador(HTTPBearer):
     async def __call__(self, request: Request):
-        autorizacion = await super().__call__(request)
-        dato = validar_token(autorizacion.credentials)
-        correo = dato.get("email")
-        if correo is None:
+        try:
+            token = await super().__call__(request)
+            datos = validar_token(token.credentials)
+            correo = datos.get("email")
+
+            if correo is None:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="El token no contiene la información del correo"
+                )
+
+            # Verifica aquí si el usuario tiene los permisos necesarios para acceder a la ruta
+            # Puedes implementar una función has_permission(token, ruta) para esto
+
+            return token
+
+        except HTTPException as e:
+            raise e  # Propaga excepciones HTTP ya lanzadas
+        except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="El token no es válido"
-            )
+                detail="Error al procesar el token"
+            ) from e
           
 
 # obtener usuario por correo
@@ -97,9 +112,9 @@ def get_all_users(db: Session = Depends(get_db)):
 
 
 # eliminar usuarios por id
-@router.delete("/delete/{id}", dependencies=[Depends(Portador())])
-def delete_user(id: int, db: Session = Depends(get_db)):
-    userDeleted = delete_users(id, db)
+@router.delete("/delete/{user_id}", dependencies=[Depends(Portador())])
+def delete_user(user_id: int, db: Session = Depends(get_db)):
+    userDeleted = delete_users(user_id, db)
     if not userDeleted:
         return {"message": "User not exist"}
     return {

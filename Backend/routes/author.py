@@ -27,7 +27,7 @@ def get_author(nombre: str, db: Session = Depends(get_db)):
     return AuthorOut(**exist.__dict__)
 
 #obtener todas las authors
-@router.get("/all_authors/", response_model=list[Author], dependencies=[Depends(Portador())])
+@router.get("/all_authors/", response_model=list[Author])
 def get_all_authors(db: Session = Depends(get_db)):
     return all_authors(db)
 
