@@ -38,7 +38,7 @@ def get_digital_book(title: str ,id_autor: int, db: Session = Depends(get_db)):
     
 
 #obtener todos los digitalBook es
-@router.get("/all_digitalBooks/", response_model=list[DigitalBookCreate])
+@router.get("/all_digitalBooks/", response_model=list[DBookOut])
 def get_all_digital_books(db: Session = Depends(get_db)):
     return all_dBooks(db)
 

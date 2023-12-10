@@ -9,7 +9,7 @@ from routes.user import Portador
 router = APIRouter()
 
 #crear rol
-@router.post("/rolcreate/", dependencies=[Depends(Portador())])
+@router.post("/rolcreate/")
 def create_new_rol(new_rol: RolCreate, db: Session = Depends(get_db)):
     exist = exist_rol(new_rol.nombre, db)
     if exist:
@@ -33,7 +33,7 @@ def get_rol(nombre: str, db: Session = Depends(get_db)):
     return RolOut(**exist.__dict__)
 
 #eliminar roles por id
-@router.delete("/rol/delete/{id}", dependencies=[Depends(Portador())])
+@router.delete("/rol/delete/{id}")
 def delete_roles(id: int, db: Session = Depends(get_db)):
     rolDeleted = delete_rol(id, db)
     if not rolDeleted:

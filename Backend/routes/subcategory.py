@@ -9,7 +9,7 @@ from routes.user import Portador
 router = APIRouter()
 
 #nueva subcategoria
-@router.post("/new_subcategory/", dependencies=[Depends(Portador())])
+@router.post("/new_subcategory/")
 def create_new_subcategory(subcategoria: SubCategory, db: Session = Depends(get_db)):
     exist = exist_subcategory(subcategoria.nombre, db)
     if exist:
@@ -34,7 +34,7 @@ def get_all_subcategories(db: Session = Depends(get_db)):
 
 #eliminar subcategorias por id  
 @router.delete("/delete_subcategories/{id}")
-def delete_subcategories(id: int, db: Session = Depends(get_db)):
+def delete_subcategories_endpoint(id: int, db: Session = Depends(get_db)):
     subcategoriaDeleted = delete_subcategories(id, db)
     if not subcategoriaDeleted:
         return {"message": "Subcategoria not exist"}
