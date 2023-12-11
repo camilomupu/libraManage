@@ -75,7 +75,7 @@ def search_digital_book(titulo: str = None, categoria: str = None, subcategoria:
 
     if titulo:
         titulo = titulo.strip()  # Elimina espacios al inicio y al final
-        query = query.filter(LibroDigital.titulo ==titulo)
+        query = query.filter(func.upper(LibroDigital.titulo).contains(titulo.upper()))
     if categoria:
         categoria = categoria.strip()
         query = query.join(Categoria).filter(func.upper(Categoria.nombre) == categoria.upper())

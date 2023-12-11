@@ -11,7 +11,7 @@ router = APIRouter()
 @router.get("/all_books_general/")
 def all_book_endpoint(db: Session = Depends(get_db)):
     
-    physicalBooks = all_dBooks(db)
+    physicalBooks = all_physicalBook(db)
     digitalBooks = all_dBooks(db)
     
     if not physicalBooks and not digitalBooks:
