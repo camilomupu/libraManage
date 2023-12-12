@@ -20,7 +20,7 @@ def create_new_report(new_report: Report, db: Session = Depends(get_db)):
     return {"message": "Reporte created successfully"}
 
 #obtener todos los informes
-@router.get("/report/",response_model=list[Report], dependencies=[Depends(Portador())])
+@router.get("/report/",response_model=list[Report])
 def get_all_report(db: Session = Depends(get_db)):
     return all_report(db)
 
@@ -52,7 +52,7 @@ def generate_report_csv(db: Session = Depends(get_db)):
 
     return Response(content=csv_content.getvalue(), media_type="text/csv", headers={"Content-Disposition": "attachment; filename=report.csv"})
 
-@router.get("/report/download-csv-all-users/", dependencies=[Depends(Portador())])
+@router.get("/report/download-csv-all-users/")
 def generate_report_csv(db: Session = Depends(get_db)):
     report_data = all_report(db)
 
@@ -82,7 +82,7 @@ def generate_report_xlsx(db: Session = Depends(get_db)):
     return Response(content=xlsx_content.getvalue(), media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", headers={"Content-Disposition": "attachment; filename=report.xlsx"})
 
 #generar xlsx por usuario
-@router.get("/report/download-xlsx-all-users/", dependencies=[Depends(Portador())])
+@router.get("/report/download-xlsx-all-users/")
 def generate_report_xlsx(db: Session = Depends(get_db)):
     report_data = all_report(db)
 
@@ -112,7 +112,7 @@ def generate_report_pdf(db: Session = Depends(get_db)):
     return Response(content=pdf_content.getvalue(), media_type="application/pdf", headers={"Content-Disposition": "attachment; filename=report.pdf"})
 
 #generar pdf por usuario
-@router.get("/report/download-pdf-all-users/", dependencies=[Depends(Portador())])
+@router.get("/report/download-pdf-all-users/")
 def generate_report_pdf(db: Session = Depends(get_db)):
     report_data = all_report(db)
 

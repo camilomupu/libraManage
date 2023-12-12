@@ -1,4 +1,6 @@
-from schemas.fine import FineCreate
+from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import datetime, timedelta
+from schemas.fine import FineCreate, Fine
 from models.tables import *
 from sqlalchemy import func, text
 
@@ -10,6 +12,29 @@ def create_fine(new_fine: FineCreate, db):
     db.commit()
     db.refresh(fine)
     return fine
+
+def add_fine_automatically(db):
+    four_days_ago = datetime.utcnow() - timedelta(days=4)
+    overdue_loans = (
+        db.query(Prestamo)
+        .filter(Prestamo.fechaPrestamo < four_days_ago, Prestamo.devuelto != True)
+        .all()
+    )
+
+    for loan in overdue_loans:
+        existing_fine = db.query(Multa).filter(Multa.id_prestamo == loan.id).first()
+
+        if not existing_fine:
+            fecha_pago = (datetime.utcnow() + timedelta(days=15)).date()
+
+            new_fine = Fine(
+                valorDeuda=50000,
+                estadoMulta=0,
+                fechaDePago=fecha_pago,
+                id_prestamo=loan.id
+            )
+
+            create_fine(new_fine, db)
 
 def exist_fine(id_Fine: int, db):
     fine = db.query(Multa).filter(Multa.id == id_Fine).first()
