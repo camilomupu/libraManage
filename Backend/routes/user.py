@@ -7,7 +7,7 @@ from schemas.user import User, UserCreate, UserOut
 from config.db import get_db
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from controllers.user import create_user, exist_user, all_users, delete_users, exist_loan, get_associated_fine, exist_user_loan, email_validation, validate_password, password_context, exist_token, validar_token, update_user
+from controllers.user import create_user, exist_user, all_users, delete_users, exist_loan, get_associated_fine, exist_user_loan, email_validation, validate_password, password_context, exist_token, validar_token, update_user, decode_token
 from controllers.email import send_welcome_email
 from controllers.hashing import Hasher
 import jwt
@@ -152,6 +152,12 @@ def check_fines_and_deadlines(correo_usuario: str, id_usuario_prestamo: int, id_
         raise HTTPException(
             status_code=404, detail="No fine associated with the user and loan")
     return {"fine": multa}
+
+@router.get("/id_userToken/{token}", dependencies=[Depends(Portador())])
+def id_user_token(token: str, db: Session = Depends(get_db)):
+    respone = decode_token(token,db)
+    return respone
+
 
 
 

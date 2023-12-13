@@ -39,7 +39,7 @@ def get_loan(id_user: int, id_book: int, date_loan: dt.date, db: Session = Depen
         return {"message": "Loan not exist"}
     return exist
 
-@router.get("/check_availability/{id_book}/{date}", dependencies=[Depends(Portador())])
+@router.get("/check_availability/{id_book}/{date}")
 def get_loan(id_book: int, date: dt.date, db: Session = Depends(get_db)):
     exist = check_availabilityWithDate(id_book, date, db)
     if not exist:
