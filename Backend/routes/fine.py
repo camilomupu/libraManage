@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from schemas.fine import Fine, FineCreate
 from config.db import get_db
 from sqlalchemy.orm import Session
-from controllers.fine import create_fine, exist_fine, all_fines, delete_fines, delete_all_fines, forgive_fine, pay_fine
+from controllers.fine import create_fine, add_fine_automatically, exist_fine, all_fines, delete_fines, delete_all_fines, forgive_fine, pay_fine
 from routes.user import Portador
 
 router = APIRouter()
@@ -14,6 +14,12 @@ def create_new_fine(fine: Fine, db: Session = Depends(get_db)):
     new_fine = create_fine(fine,db)
     #return Fine(**new_fine.__dict__)
     return {"message": "Fine created successfully"}
+
+#agregar multas automaticamente
+@router.post("/add_fine_automatically/")
+def add_fine_automatically_route(db: Session = Depends(get_db)):
+    add_fine_automatically(db)
+    return {"message": "Fines added successfully"}
 
 
 #obtener fine por id_fine
@@ -27,7 +33,7 @@ def get_fine(id: int, db: Session = Depends(get_db)):
     
 
 #obtener todos los fines
-@router.get("/all_finee/", dependencies=[Depends(Portador())])
+@router.get("/all_finee/")
 def get_all_fines(db: Session = Depends(get_db)):
     return all_fines(db)
 
@@ -40,7 +46,7 @@ def pay_fine_route(id_fine: int, db: Session = Depends(get_db)):
     return {"message": "Fine paid successfully"}
 
 #perdonar una multa
-@router.put("/forgive_fine/{id_fine}", dependencies=[Depends(Portador())])
+@router.put("/forgive_fine/{id_fine}")
 def forgive_fine_route(id_fine: int, db: Session = Depends(get_db)):
     fineForgiven = forgive_fine(id_fine, db)
     if not fineForgiven:
@@ -48,7 +54,7 @@ def forgive_fine_route(id_fine: int, db: Session = Depends(get_db)):
     return {"message": "Fine forgiven successfully"}
 
 #eliminar fines por id_fine
-@router.delete("/delete_fine/{id_fine}", dependencies=[Depends(Portador())])
+@router.delete("/delete_fine/{id_fine}")
 def delete_fine(id_fine: int, db: Session = Depends(get_db)):
     fineDeleted = delete_fines(id_fine, db)
     if not fineDeleted:
