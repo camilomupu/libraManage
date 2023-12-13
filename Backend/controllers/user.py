@@ -2,12 +2,13 @@ from fastapi.responses import JSONResponse
 from schemas.physicalBook import PhysicalBook
 from fastapi import HTTPException, status, Depends
 from pydantic import EmailStr
-from schemas.user import UserCreate, UserOut
+from schemas.user import UserCreate, UserOut, User
 from models.tables import Usuario
 from sqlalchemy import func, text
 from models.tables import LibroFisico, Multa, Prestamo, Usuario
 from passlib.context import CryptContext
 from controllers.hashing import Hasher
+from typing import List, Optional
 
 import jwt
 from jwt import encode, decode
@@ -40,9 +41,6 @@ def validar_token(token:str)->dict:
     dato:dict = decode(token, "tu_clave_secreta", algorithms=["HS256"])
     
     return dato
-
-        
-
 
 def exist_token(correo:str, contrasena:str,  db):
     usr = db.query(Usuario).filter(Usuario.correo == correo and Usuario.contrasena == contrasena).first()
@@ -92,16 +90,20 @@ def get_user(id: int, db):
 def all_users(db):
     return db.query(Usuario).all()
 
-"""def delete_users(id: int, db):
-    # Obtiene el valor del id antes de eliminar el registro
-    usr = db.query(Usuario).filter(Usuario.id == id).first()
-    db.delete(usr)
-    db.commit()
-    max_id = db.query(func.max(Usuario.id)).scalar()
-    db.execute(text(f"ALTER SEQUENCE usuarios_id_seq RESTART WITH {max_id + 1}"))
-    print(max_id)
-    db.commit()
-    return usr"""
+def update_user(user_id: int, updated_user: UserOut, db) -> Optional[UserOut]:
+        usr = get_user(user_id, db)
+        if usr:
+            usr.nombre = updated_user.nombre
+            usr.correo = updated_user.correo
+            usr.fechaNacimiento = updated_user.fechaNacimiento
+            usr.id_rol = updated_user.id_rol
+            usr.contrasena = usr.contrasena
+            db.commit()  # Guarda los cambios en la base de datos
+            db.refresh(usr)
+            return usr
+        return None
+    
+    
 def delete_users(id: int, db):
     # Obtiene el valor del id antes de eliminar el registro
     usr = db.query(Usuario).filter(Usuario.id == id).first()

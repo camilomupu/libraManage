@@ -7,7 +7,7 @@ from schemas.user import User, UserCreate, UserOut
 from config.db import get_db
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from controllers.user import create_user, exist_user, all_users, delete_users, exist_loan, get_associated_fine, exist_user_loan, email_validation, validate_password, password_context, exist_token, validar_token
+from controllers.user import create_user, exist_user, all_users, delete_users, exist_loan, get_associated_fine, exist_user_loan, email_validation, validate_password, password_context, exist_token, validar_token, update_user
 from controllers.email import send_welcome_email
 from controllers.hashing import Hasher
 import jwt
@@ -96,7 +96,7 @@ class Portador(HTTPBearer):
           
 
 # obtener usuario por correo
-@router.get("/{correo}", dependencies=[Depends(Portador())])
+@router.get("get_user/{correo}", dependencies=[Depends(Portador())])
 def get_user(correo: str, db: Session = Depends(get_db)):
     exist = exist_user(correo, db)
     if not exist:
@@ -110,6 +110,14 @@ def get_user(correo: str, db: Session = Depends(get_db)):
 def get_all_users(db: Session = Depends(get_db)):
     return all_users(db)
 
+#Ruta para actualizar un usuario
+@router.put("/update_user/{user_id}", dependencies=[Depends(Portador())])
+def update_users(user_id:int, update_usr:User, db: Session = Depends(get_db)):
+    usr = update_user(user_id, update_usr, db)
+    if usr:
+        return usr
+    raise HTTPException(status_code=404, detail="User not found")
+    
 
 # eliminar usuarios por id
 @router.delete("/delete/{user_id}", dependencies=[Depends(Portador())])
