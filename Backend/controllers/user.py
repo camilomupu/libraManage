@@ -137,6 +137,23 @@ def exist_user_loan(id_user: int, db):#verificamos si el usuario tiene prestamos
 def get_user_by_email(email: str, db):
     return db.query(Usuario).filter(Usuario.correo == email).first()
 
+def return_id_user(email: str, db):
+    return db.query(Usuario.id).filter(Usuario.correo == email).first()
+
+def decode_token(token: str, db):
+    try:
+        decoded_token = jwt.decode(token, "tu_clave_secreta", algorithms=["HS256"])
+        correo = decoded_token.get("email")
+        print(correo)
+        usuario = return_id_user(correo, db)
+        print(usuario)
+        if usuario:
+            return usuario.id
+        else:
+            return False
+    except:
+        return False
+
         
         
 
