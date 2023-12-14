@@ -65,7 +65,7 @@ def login(correo: str, contrasena: str, db: Session = Depends(get_db)):
         )
     
     # return usr, token
-    return token
+    return {"token": token}
 
 
 

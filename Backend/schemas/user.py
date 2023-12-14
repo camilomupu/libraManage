@@ -14,6 +14,11 @@ class UserCreate(User):
 class UserUpdate(User):
     id_rol: int
     
+class UserEdit(User):
+    id_rol : int
+    token : str
+    
+    
     
 
 class UserOut(User):
