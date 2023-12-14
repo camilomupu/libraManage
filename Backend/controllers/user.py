@@ -6,6 +6,7 @@ from schemas.user import UserCreate, UserOut, User
 from models.tables import Usuario
 from sqlalchemy import func, text
 from models.tables import LibroFisico, Multa, Prestamo, Usuario
+from controllers.rol import get_rol_id
 from passlib.context import CryptContext
 from controllers.hashing import Hasher
 from typing import List, Optional
@@ -25,6 +26,8 @@ def create_user(new_user: UserOut, db):
     # Crear el token
     secret_key = "tu_clave_secreta"
     algorithm = "HS256"
+    rol_id = get_rol_id("Cliente", db)
+    usr.id_rol = rol_id
     payload = {
         "id": usr.id,
         "email": usr.correo,
@@ -97,7 +100,7 @@ def update_user(user_id: int, updated_user: UserOut, db) -> Optional[UserOut]:
             usr.correo = updated_user.correo
             usr.fechaNacimiento = updated_user.fechaNacimiento
             usr.id_rol = updated_user.id_rol
-            usr.contrasena = usr.contrasena
+            usr.contrasena = password_context.hash(usr.contrasena)
             db.commit()  # Guarda los cambios en la base de datos
             db.refresh(usr)
             return usr

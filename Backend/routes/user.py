@@ -3,7 +3,7 @@ from http.client import HTTPException
 from models.tables import Multa, Usuario
 from fastapi import APIRouter, Depends, Request
 from fastapi.security import HTTPBearer
-from schemas.user import User, UserCreate, UserOut
+from schemas.user import User, UserCreate, UserOut,UserUpdate
 from config.db import get_db
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
@@ -40,7 +40,7 @@ async def register(new_user: UserCreate, db: Session = Depends(get_db)):
     return token
 
 
-@router.post("/login_user")
+@router.post("/login_user/")
 def login(correo: str, contrasena: str, db: Session = Depends(get_db)):
     # Validar el correo electrónico
     email_validation(correo, db)
@@ -96,7 +96,7 @@ class Portador(HTTPBearer):
           
 
 # obtener usuario por correo
-@router.get("get_user/{correo}", dependencies=[Depends(Portador())])
+@router.get("/get_user/{correo}", dependencies=[Depends(Portador())])
 def get_user(correo: str, db: Session = Depends(get_db)):
     exist = exist_user(correo, db)
     if not exist:
@@ -112,7 +112,7 @@ def get_all_users(db: Session = Depends(get_db)):
 
 #Ruta para actualizar un usuario
 @router.put("/update_user/{user_id}", dependencies=[Depends(Portador())])
-def update_users(user_id:int, update_usr:User, db: Session = Depends(get_db)):
+def update_users(user_id:int, update_usr:UserUpdate, db: Session = Depends(get_db)):
     usr = update_user(user_id, update_usr, db)
     if usr:
         return usr
