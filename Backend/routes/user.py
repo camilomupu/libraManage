@@ -7,7 +7,7 @@ from schemas.user import User, UserCreate, UserOut,UserUpdate
 from config.db import get_db
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from controllers.user import create_user, exist_user, all_users, delete_users, exist_loan, get_associated_fine, exist_user_loan, email_validation, validate_password, password_context, exist_token, validar_token, update_user, decode_token
+from controllers.user import create_user, exist_user, all_users, delete_users, exist_loan, get_associated_fine, exist_user_loan, email_validation, validate_password, password_context, exist_token, validar_token, update_user, decode_token,exist_email
 from controllers.email import send_welcome_email
 from controllers.hashing import Hasher
 import jwt
@@ -67,6 +67,8 @@ def login(correo: str, contrasena: str, db: Session = Depends(get_db)):
     # return usr, token
     return token
 
+
+
 #Para la validacion del token
 class Portador(HTTPBearer):
     async def __call__(self, request: Request):
@@ -93,6 +95,17 @@ class Portador(HTTPBearer):
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Error al procesar el token"
             ) from e
+            
+@router.post("/exist_correo/{correo}")
+def exist_correo(correo: str, db: Session = Depends(get_db)):
+    # Verificar si el usuario existe
+    usr = exist_email(correo, db)
+    if not usr:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="El usuario no existe"
+        )
+    return True
           
 
 # obtener usuario por correo
@@ -129,6 +142,8 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
         "message": "User deleted successfully",
         "user": User(**userDeleted.__dict__),
     }
+
+
 
 
 @router.get("/management_fine/{correo}/{id_user}/{id_prestamo}", dependencies=[Depends(Portador())])

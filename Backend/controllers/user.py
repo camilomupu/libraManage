@@ -105,6 +105,10 @@ def update_user(user_id: int, updated_user: UserOut, db) -> Optional[UserOut]:
             db.refresh(usr)
             return usr
         return None
+
+def exist_email(email: str, db):
+    usr = db.query(Usuario).filter(Usuario.correo == email).first()
+    return usr
     
     
 def delete_users(id: int, db):
