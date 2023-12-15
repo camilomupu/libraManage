@@ -3,5 +3,5 @@
         "*.embeddedhtml": "html",
         "plyconfig.json": "jsonc"
     },
-    "docwriter.style": "Auto-detect"
+    "docwriter.style": "Google"
 }
