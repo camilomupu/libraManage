@@ -50,7 +50,7 @@ def exist_user_admin(correo:str, db): #Verificamos si el usuario es administrado
         return True
     return False
 
-async def register_digitalBook(titulo:str,descripcion:str, precio:str, id_autor:int, id_categoria:int, id_subcategoria:int
+async def register_digitalBook(titulo:str,descripcion:str, precio:float, id_autor:int, id_categoria:int, id_subcategoria:int
                   , file_img: UploadFile = None, file_pdf : UploadFile = None, url_image:str = None,
                   link_libro:str=None):
     if file_img is not None:
@@ -66,7 +66,7 @@ async def register_digitalBook(titulo:str,descripcion:str, precio:str, id_autor:
     if url_pdf is None:
         raise ValueError("Se requiere un pdf (file o url_pdf) para crear el libro digital.")
     
-    new_digitalBook = DigitalBookCreate(titulo=titulo, portada=url_img, link_Libro=url_pdf, descripcion = descripcion,
+    new_digitalBook = DigitalBookCreate(titulo=titulo, portada=url_img, descripcion = descripcion, link_Libro=url_pdf, 
                                         precio = precio,id_autor=id_autor, id_subcategoria=id_subcategoria, 
                                         id_categoria=id_categoria,)
     return new_digitalBook

@@ -12,13 +12,13 @@ from routes.user import Portador
 
 router = APIRouter()
 
-    
-@router.post("/register_physicalBooks/", dependencies=[Depends(Portador())])
-async def register_physicalBooks(correo:str,titulo:str,descripcion:str,ubicacion:str,
+
+@router.post("/register_physicalBooks/")
+async def register_physicalBooks(titulo:str,descripcion:str,ubicacion:str,
                   estado:str, id_autor:int, id_categoria:int, id_subcategoria:int
                   , file: UploadFile = None, url_image:str = None, db: Session = Depends(get_db)):
-    if not exist_user_admin(correo,db):
-        raise HTTPException(status_code=400, detail="You are not admin")
+    #if not exist_user_admin(correo,db):
+        #raise HTTPException(status_code=400, detail="You are not admin")
     if file is None and url_image is None:
         raise HTTPException(status_code=400, detail="You need to upload a file or url_image")
     exist = exist_physicalBook(titulo, id_autor, db)

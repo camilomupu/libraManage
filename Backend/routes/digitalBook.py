@@ -8,11 +8,9 @@ from routes.user import Portador
 
 router = APIRouter()
     
-@router.post("/register_digitalBooks/", dependencies=[Depends(Portador())])
-async def register_digitalBooks(correo:str,titulo:str,descripcion:str, precio:str, id_autor:int, id_categoria:int, id_subcategoria:int
+@router.post("/register_digitalBooks/")
+async def register_digitalBooks(titulo:str,descripcion:str, precio:float, id_autor:int, id_categoria:int, id_subcategoria:int
                   , file_img: UploadFile = None, file_pdf : UploadFile = None, url_image:str = None, link_libro:str=None,  db: Session = Depends(get_db)):
-    if not exist_user_admin(correo,db):
-        raise HTTPException(status_code=400, detail="You are not admin")
     if file_img is None and url_image is None:
         raise HTTPException(status_code=400, detail="You need to upload a file or url_image")
     if file_pdf is None and link_libro is None:
