@@ -12,13 +12,11 @@ from routes.user import Portador
 
 router = APIRouter()
 
-
+    
 @router.post("/register_physicalBooks/")
 async def register_physicalBooks(titulo:str,descripcion:str,ubicacion:str,
                   estado:str, id_autor:int, id_categoria:int, id_subcategoria:int
                   , file: UploadFile = None, url_image:str = None, db: Session = Depends(get_db)):
-    #if not exist_user_admin(correo,db):
-        #raise HTTPException(status_code=400, detail="You are not admin")
     if file is None and url_image is None:
         raise HTTPException(status_code=400, detail="You need to upload a file or url_image")
     exist = exist_physicalBook(titulo, id_autor, db)
@@ -45,13 +43,14 @@ def get_all_physicalBook(db: Session = Depends(get_db)):
     return all_physicalBook(db)
 
 #eliminar libro fisico por id
-@router.delete("/delete_physicalBook/{id}", dependencies=[Depends(Portador())])
+@router.delete("/delete_physicalBook/{id}")
 def delete_physicalBookk(id: int, db: Session = Depends(get_db)):
+    print("dsnjfjsadbjfbhajsdbfhjdsabjfsdbjkfadshjbdfjfbasdj")
+    print(id)
     physicalBookDeleted = delete_physicalBook(id, db)
     if not physicalBookDeleted:
         return {"message": "Physical book not exist"}
-    return {"message": "Physical book deleted successfully", 
-            "physical book": PhysicalBook(**physicalBookDeleted.__dict__)}
+    return {"message": "Physical book deleted successfully"}
     
 
 @router.get("/search_physicalBook/")

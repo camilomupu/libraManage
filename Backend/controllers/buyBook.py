@@ -2,10 +2,10 @@ from schemas.buyBook import BuyBookCreate, BuyBookCreateNameBook, BuyBookOut
 from models.tables import *
 from sqlalchemy import func, text
 from typing import List, Optional
+from datetime import datetime
 
 def create_BuyDBooks(nuevo_BuyDBook: BuyBookCreate, db):
     compLibro = CompraLibro(**nuevo_BuyDBook.dict())
-    ## Acá va la logica de consulta en la base de datos
     db.add(compLibro)
     db.commit()
     db.refresh(compLibro)
@@ -13,11 +13,37 @@ def create_BuyDBooks(nuevo_BuyDBook: BuyBookCreate, db):
 
 def create_BuyDBooks(nuevo_BuyDBook: BuyBookCreateNameBook, db):
     compLibro = CompraLibro(**nuevo_BuyDBook.dict())
-    ## Acá va la logica de consulta en la base de datos
     db.add(compLibro)
     db.commit()
     db.refresh(compLibro)
+
+    actualizar_informe_usuario(nuevo_BuyDBook.id_usuario, db)
+
     return compLibro
+
+def actualizar_informe_usuario(user_id: int, db):
+    informe_usuario = db.query(Informe).filter(Informe.id_usuario == user_id).first()
+
+    if informe_usuario:
+
+        informe_usuario.numeroComprasLibros += 1 
+
+        db.commit()
+        db.refresh(informe_usuario)
+    else:
+
+        nuevo_informe = Informe(
+            fechaGeneracion=datetime.utcnow(),
+            numeroLibrosPrestados=0,
+            numeroLibrosNoDevueltos=0, 
+            numeroComprasLibros=1,
+            id_usuario=user_id
+        )
+
+        db.add(nuevo_informe)
+        db.commit()
+        db.refresh(nuevo_informe)
+
 
 def exist_BuyDBook(id_user: int, id_dBook: int, db):
     compLibros = db.query(CompraLibro).filter((CompraLibro.id_usuario == id_user) & (CompraLibro.id_libroDigital == id_dBook)).first()

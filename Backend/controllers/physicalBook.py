@@ -29,10 +29,6 @@ def delete_physicalBook(id: int, db):
     book = db.query(LibroFisico).filter(LibroFisico.id == id).first()
     db.delete(book)
     db.commit()
-    max_id = db.query(func.max(LibroFisico.id)).scalar()
-    db.execute(text(f"ALTER SEQUENCE librosFisicos_id_seq RESTART WITH {max_id + 1}"))
-    print(max_id)
-    db.commit()
     return book
     
 def exist_user_admin(correo:str, db): #Verificamos si el usuario es administrador

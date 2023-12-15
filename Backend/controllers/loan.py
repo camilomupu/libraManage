@@ -3,6 +3,7 @@ import datetime as dt
 from models.tables import *
 from sqlalchemy import func, text
 from typing import List, Optional
+from datetime import datetime
 
 def create_loan(new_loan: Loan, db):
     loan = Prestamo(**new_loan.__dict__)
@@ -12,7 +13,32 @@ def create_loan(new_loan: Loan, db):
     db.add(loan)
     db.commit()
     db.refresh(loan)
+
+    actualizar_informe_usuario(new_loan.id_usuario, db)
+
     return loan
+
+def actualizar_informe_usuario(user_id: int, db):
+    informe_usuario = db.query(Informe).filter(Informe.id_usuario == user_id).first()
+
+    if informe_usuario:
+        informe_usuario.numeroLibrosPrestados += 1
+
+        db.commit()
+        db.refresh(informe_usuario)
+    else:
+
+        nuevo_informe = Informe(
+            fechaGeneracion=datetime.utcnow(),
+            numeroLibrosPrestados=1,
+            numeroLibrosNoDevueltos=0,
+            numeroComprasLibros=0,
+            id_usuario=user_id
+        )
+
+        db.add(nuevo_informe)
+        db.commit()
+        db.refresh(nuevo_informe)
 
 def exist_loan(id_user: int, id_book: int, date_loan: Date, db):
     loan = db.query(Prestamo).filter((Prestamo.id_usuario == id_user) & (Prestamo.id_libroFisico == id_book) & 
