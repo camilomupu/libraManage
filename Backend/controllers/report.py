@@ -7,6 +7,10 @@ from models.tables import Informe, Usuario
 from sqlalchemy import func, text
 from reportlab.pdfgen import canvas
 from typing import List, Optional
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
 
 def create_report(new_report: Report, db):
     report = Informe(**new_report.dict())
@@ -156,41 +160,42 @@ def generate_pdf_content(report_data):
 
 def generate_pdf_content_by_user(report_data, db):
     pdf_buffer = BytesIO()
-    pdf = canvas.Canvas(pdf_buffer)
+    pdf = SimpleDocTemplate(pdf_buffer, pagesize=letter)
 
-    pdf.setTitle("Informe General")
+    styles = getSampleStyleSheet()
 
-    pdf.setFont("Helvetica-Bold", 14)
-    pdf.drawString(100, 830, "LibraManage - Sistema de Gestión de Bibliotecas")
-
-    pdf.setFont("Helvetica-Bold", 12)
-    pdf.drawString(100, 800, "Informe General")
-
-    pdf.setFont("Helvetica", 10)
-    pdf.drawString(100, 780, "Fecha Generacion")
-    pdf.drawString(100, 760, "Libros Prestados")
-    pdf.drawString(100, 740, "Libros Comprados")
-    pdf.drawString(100, 720, "Libros No Devueltos")
-    pdf.drawString(100, 700, "Usuario")
+    data = [["Fecha Generación", "Libros Prestados", "Libros Comprados", "Libros No Devueltos", "Usuario"]]
 
     for informe in report_data:
-        fecha_generacion = informe.fechaGeneracion
-        libros_prestados = informe.numeroLibrosPrestados
-        libros_comprados = informe.numeroComprasLibros
-        libros_no_devueltos = informe.numeroLibrosNoDevueltos
+        fecha_generacion = str(informe.fechaGeneracion)
+        libros_prestados = str(informe.numeroLibrosPrestados)
+        libros_comprados = str(informe.numeroComprasLibros)
+        libros_no_devueltos = str(informe.numeroLibrosNoDevueltos)
         usuario = informe.id_usuario
 
-        usuario = db.query(Usuario).filter(Usuario.id == usuario).first()
-        nombre_usuario = usuario.nombre
+        usuario_obj = db.query(Usuario).filter(Usuario.id == usuario).first()
+        nombre_usuario = usuario_obj.nombre
 
-        pdf.drawString(300, 780, str(fecha_generacion))
-        pdf.drawString(300, 760, str(libros_prestados))
-        pdf.drawString(300, 740, str(libros_comprados))
-        pdf.drawString(300, 720, str(libros_no_devueltos))
-        pdf.drawString(300, 700, str(nombre_usuario))
+        data.append([fecha_generacion, libros_prestados, libros_comprados, libros_no_devueltos, nombre_usuario])
 
-    pdf.showPage()
-    pdf.save()
+    table_style = TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ])
+
+    table = Table(data, style=table_style)
+
+    elements = []
+    elements.append(Paragraph("LibraManage - Sistema de Gestión de Bibliotecas", styles['Title']))
+    elements.append(Paragraph("Informe General", styles['Heading1']))
+    elements.append(table)
+
+    pdf.build(elements)
 
     return pdf_buffer
 
