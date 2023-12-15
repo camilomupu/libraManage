@@ -3,11 +3,11 @@ from http.client import HTTPException
 from models.tables import Multa, Usuario
 from fastapi import APIRouter, Depends, Request
 from fastapi.security import HTTPBearer
-from schemas.user import User, UserCreate, UserOut
+from schemas.user import User, UserCreate, UserOut,UserUpdate
 from config.db import get_db
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from controllers.user import create_user, exist_user, all_users, delete_users, exist_loan, get_associated_fine, exist_user_loan, email_validation, validate_password, password_context, exist_token, validar_token, update_user, decode_token
+from controllers.user import create_user, exist_user, all_users, delete_users, exist_loan, get_associated_fine, exist_user_loan, email_validation, validate_password, password_context, exist_token, validar_token, update_user, decode_token,exist_email
 from controllers.email import send_welcome_email
 from controllers.hashing import Hasher
 import jwt
@@ -40,7 +40,7 @@ async def register(new_user: UserCreate, db: Session = Depends(get_db)):
     return token
 
 
-@router.post("/login_user")
+@router.post("/login_user/")
 def login(correo: str, contrasena: str, db: Session = Depends(get_db)):
     # Validar el correo electrónico
     email_validation(correo, db)
@@ -65,7 +65,9 @@ def login(correo: str, contrasena: str, db: Session = Depends(get_db)):
         )
     
     # return usr, token
-    return token
+    return {"token": token}
+
+
 
 #Para la validacion del token
 class Portador(HTTPBearer):
@@ -93,10 +95,21 @@ class Portador(HTTPBearer):
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Error al procesar el token"
             ) from e
+            
+@router.post("/exist_correo/{correo}")
+def exist_correo(correo: str, db: Session = Depends(get_db)):
+    # Verificar si el usuario existe
+    usr = exist_email(correo, db)
+    if not usr:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="El usuario no existe"
+        )
+    return True
           
 
 # obtener usuario por correo
-@router.get("get_user/{correo}", dependencies=[Depends(Portador())])
+@router.get("/get_user/{correo}", dependencies=[Depends(Portador())])
 def get_user(correo: str, db: Session = Depends(get_db)):
     exist = exist_user(correo, db)
     if not exist:
@@ -112,7 +125,7 @@ def get_all_users(db: Session = Depends(get_db)):
 
 #Ruta para actualizar un usuario
 @router.put("/update_user/{user_id}", dependencies=[Depends(Portador())])
-def update_users(user_id:int, update_usr:User, db: Session = Depends(get_db)):
+def update_users(user_id:int, update_usr:UserUpdate, db: Session = Depends(get_db)):
     usr = update_user(user_id, update_usr, db)
     if usr:
         return usr
@@ -129,6 +142,8 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
         "message": "User deleted successfully",
         "user": User(**userDeleted.__dict__),
     }
+
+
 
 
 @router.get("/management_fine/{correo}/{id_user}/{id_prestamo}", dependencies=[Depends(Portador())])

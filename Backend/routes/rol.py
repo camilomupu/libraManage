@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from schemas.rol import RolCreate, RolOut
 from config.db import get_db
 from sqlalchemy.orm import Session
-from controllers.rol import create_rol, exist_rol, all_roles, delete_rol
+from controllers.rol import create_rol, exist_rol, all_roles, delete_rol, exist_rolId
 from routes.user import Portador
 
 router = APIRouter()
@@ -30,6 +30,13 @@ def get_rol(nombre: str, db: Session = Depends(get_db)):
     if not exist:
         return {"message": "Rol not exist"}
     
+    return RolOut(**exist.__dict__)
+
+@router.get("/get_rol/{id}", dependencies=[Depends(Portador())])
+def get_rolId(id_rol:int, db:Session=Depends(get_db)):
+    exist = exist_rolId(id_rol, db)
+    if not exist:
+        return {"message": "Rol not exist"}
     return RolOut(**exist.__dict__)
 
 #eliminar roles por id
