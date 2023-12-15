@@ -1,6 +1,8 @@
 from schemas.category import Category
 from models.tables import *
 from sqlalchemy import func, text
+from typing import List, Optional
+
 
 def create_category(new_category: Category, db):
     """
@@ -69,3 +71,17 @@ def delete_categories(id: int, db):
     print(max_id)
     db.commit()
     return cat
+
+def get_category(id: int, db):
+    cat = db.query(Categoria).filter(Categoria.id == id).first()
+    return cat
+
+
+def update_category(category_id: int, updated_category: Category, db) -> Optional[Category]:
+        usr = get_category(category_id, db)
+        if usr:
+            usr.nombre = updated_category.nombre
+            db.commit()  # Guarda los cambios en la base de datos
+            db.refresh(usr)
+            return usr
+        return None

@@ -92,9 +92,9 @@ def obtener_estadoPrestamos(db):
     info_diccionario = [{"fecha_vencimiento": str(prestamo.fechaVencimiento), "devuelto": prestamo.devuelto} for prestamo in prestamos_info]
 
     return info_diccionario
-    
+    #
 #Pregunta respuesta
-@router.get("/consultaChatGPT/")
+@router.get("/consultaChatGPT/{pregunta}")
 def pregunta_chatGPT(pregunta: str, db: Session = Depends(get_db)):
     """
     Interactúa con el modelo de lenguaje GPT-3.5 Turbo de OpenAI para obtener respuestas a preguntas específicas de la app.

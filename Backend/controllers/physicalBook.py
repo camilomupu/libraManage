@@ -4,6 +4,8 @@ from sqlalchemy import func, text
 from sqlalchemy.orm import Session, joinedload
 from fastapi import UploadFile, File
 from config.db import upload_img
+from typing import List, Optional
+
 
 def create_physicalBook(new_book: PhysicalBook, db):
     """
@@ -66,10 +68,6 @@ def delete_physicalBook(id: int, db):
     """
     book = db.query(LibroFisico).filter(LibroFisico.id == id).first()
     db.delete(book)
-    db.commit()
-    max_id = db.query(func.max(LibroFisico.id)).scalar()
-    db.execute(text(f"ALTER SEQUENCE librosFisicos_id_seq RESTART WITH {max_id + 1}"))
-    print(max_id)
     db.commit()
     return book
     
@@ -156,3 +154,24 @@ def search_physical_book(titulo: str = None, categoria: str = None, subcategoria
         
     digitalBooks = query.all()
     return digitalBooks
+
+def get_physicalbook(id: int, db):
+    cat = db.query(LibroFisico).filter(LibroFisico.id == id).first()
+    return cat
+
+
+def update_physicalbook(physicalbook_id: int, updated_physicalbook: PhysicalBook, db) -> Optional[PhysicalBook]:
+        usr = get_physicalbook(physicalbook_id, db)
+        if usr:
+            usr.titulo = updated_physicalbook.titulo
+            usr.descripcion = updated_physicalbook.descripcion
+            usr.portada = updated_physicalbook.portada
+            usr.ubicacion = updated_physicalbook.ubicacion
+            usr.estado = updated_physicalbook.estado
+            usr.id_autor = updated_physicalbook.id_autor
+            usr.id_categoria = updated_physicalbook.id_categoria
+            usr.id_subcategoria = updated_physicalbook.id_subcategoria
+            db.commit()  # Guarda los cambios en la base de datos
+            db.refresh(usr)
+            return usr
+        return None

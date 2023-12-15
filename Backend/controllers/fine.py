@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from schemas.fine import FineCreate, Fine
 from models.tables import *
 from sqlalchemy import func, text
+from typing import List, Optional
 
 def create_fine(new_fine: FineCreate, db):
     """
@@ -133,3 +134,21 @@ def delete_all_fines(db):
     except Exception as e:
         db.rollback()
         return {"message": f"An error occurred: {str(e)}"}
+    
+
+def get_fine(id: int, db):
+    cat = db.query(Multa).filter(Multa.id == id).first()
+    return cat
+
+
+def update_fine(fine_id: int, updated_fine: Fine, db) -> Optional[Fine]:
+        usr = get_fine(fine_id, db)
+        if usr:
+            usr.valorDeuda = updated_fine.valorDeuda
+            usr.estadoMulta = updated_fine.estadoMulta
+            usr.fechaDePago = updated_fine.fechaDePago
+            usr.id_prestamo = updated_fine.id_prestamo
+            db.commit()  # Guarda los cambios en la base de datos
+            db.refresh(usr)
+            return usr
+        return None

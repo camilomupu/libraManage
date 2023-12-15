@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from fastapi import UploadFile, File
 from config.db import upload_img, upload_pdfs
 from sqlalchemy.exc import NoResultFound
+from typing import List, Optional
 
 def create_dBook(nuevo_dBook: DigitalBookCreate, db):
     """
@@ -97,7 +98,7 @@ def exist_user_admin(correo:str, db): #Verificamos si el usuario es administrado
         return True
     return False
 
-async def register_digitalBook(titulo:str,descripcion:str, precio:str, id_autor:int, id_categoria:int, id_subcategoria:int
+async def register_digitalBook(titulo:str,descripcion:str, precio:float, id_autor:int, id_categoria:int, id_subcategoria:int
                   , file_img: UploadFile = None, file_pdf : UploadFile = None, url_image:str = None,
                   link_libro:str=None):
     """
@@ -129,7 +130,7 @@ async def register_digitalBook(titulo:str,descripcion:str, precio:str, id_autor:
     if url_pdf is None:
         raise ValueError("Se requiere un pdf (file o url_pdf) para crear el libro digital.")
     
-    new_digitalBook = DigitalBookCreate(titulo=titulo, portada=url_img, link_Libro=url_pdf, descripcion = descripcion,
+    new_digitalBook = DigitalBookCreate(titulo=titulo, portada=url_img, descripcion = descripcion, link_Libro=url_pdf, 
                                         precio = precio,id_autor=id_autor, id_subcategoria=id_subcategoria, 
                                         id_categoria=id_categoria,)
     return new_digitalBook
@@ -162,3 +163,24 @@ def search_digital_book(titulo: str = None, categoria: str = None, subcategoria:
 
     digitalBooks = query.all()
     return digitalBooks
+
+def get_digitalbookcreate(id: int, db):
+    cat = db.query(LibroDigital).filter(LibroDigital.id == id).first()
+    return cat
+
+
+def update_digitalbookcreate(digitalbookcreate_id: int, updated_digitalbookcreate: DigitalBookCreate, db) -> Optional[DigitalBookCreate]:
+        usr = get_digitalbookcreate(digitalbookcreate_id, db)
+        if usr:
+            usr.titulo = updated_digitalbookcreate.titulo
+            usr.descripcion = updated_digitalbookcreate.descripcion
+            usr.portada = updated_digitalbookcreate.portada
+            usr.link_Libro = updated_digitalbookcreate.link_Libro
+            usr.id_autor = updated_digitalbookcreate.id_autor
+            usr.id_categoria = updated_digitalbookcreate.id_categoria
+            usr.id_subcategoria = updated_digitalbookcreate.id_subcategoria
+            usr.precio = updated_digitalbookcreate.precio
+            db.commit()  # Guarda los cambios en la base de datos
+            db.refresh(usr)
+            return usr
+        return None

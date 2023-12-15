@@ -1,4 +1,5 @@
 from passlib.context import CryptContext
+from typing import List, Optional
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

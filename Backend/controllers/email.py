@@ -9,6 +9,7 @@ from schemas.digitalBook import DigitalBookCreate
 from schemas.physicalBook import PhysicalBook
 from schemas.loan import loanDueDate
 from starlette.responses import JSONResponse
+from typing import List, Optional
 
 
 # Establecer la configuración regional a español

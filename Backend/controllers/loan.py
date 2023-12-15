@@ -2,6 +2,8 @@ from schemas.loan import Loan, LoanOut, loanDueDate
 import datetime as dt
 from models.tables import *
 from sqlalchemy import func, text
+from typing import List, Optional
+from datetime import datetime
 
 def create_loan(new_loan: Loan, db):
     """
@@ -19,7 +21,32 @@ def create_loan(new_loan: Loan, db):
     db.add(loan)
     db.commit()
     db.refresh(loan)
+
+    actualizar_informe_usuario(new_loan.id_usuario, db)
+
     return loan
+
+def actualizar_informe_usuario(user_id: int, db):
+    informe_usuario = db.query(Informe).filter(Informe.id_usuario == user_id).first()
+
+    if informe_usuario:
+        informe_usuario.numeroLibrosPrestados += 1
+
+        db.commit()
+        db.refresh(informe_usuario)
+    else:
+
+        nuevo_informe = Informe(
+            fechaGeneracion=datetime.utcnow(),
+            numeroLibrosPrestados=1,
+            numeroLibrosNoDevueltos=0,
+            numeroComprasLibros=0,
+            id_usuario=user_id
+        )
+
+        db.add(nuevo_informe)
+        db.commit()
+        db.refresh(nuevo_informe)
 
 def exist_loan(id_user: int, id_book: int, date_loan: Date, db):
     """
@@ -83,6 +110,12 @@ def all_loan(db):
         List[Prestamo]: Lista de todos los préstamos.
     """
     return db.query(Prestamo).all()
+
+def all_loan_not_returned(db):
+    return db.query(Prestamo).filter(Prestamo.devuelto == False).all()
+
+def all_loan_by_user(id_user: int, db):
+    return db.query(Prestamo).filter(Prestamo.id_usuario == id_user).all()
 
 def return_loan_by_book_name_and_date(book_name: str, loan_date: dt.date, db):
     """
@@ -162,3 +195,19 @@ def delete_all_loans(db):
     except Exception as e:
         db.rollback()
         return {"message": f"An error occurred: {str(e)}"}
+    
+def get_loan(id: int, db):
+    cat = db.query(Prestamo).filter(Prestamo.id == id).first()
+    return cat
+
+
+def update_loan(loan_id: int, updated_loan: Loan, db) -> Optional[Loan]:
+        usr = get_loan(loan_id, db)
+        if usr:
+            usr.id_usuario = updated_loan.id_usuario
+            usr.id_libroFisico = updated_loan.id_libroFisico
+            usr.fechaPrestamo = updated_loan.fechaPrestamo
+            db.commit()  # Guarda los cambios en la base de datos
+            db.refresh(usr)
+            return usr
+        return None

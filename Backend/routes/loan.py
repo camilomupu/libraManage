@@ -3,7 +3,7 @@ from schemas.loan import Loan, LoanOut, loanDueDate
 from config.db import get_db
 from sqlalchemy.orm import Session
 import datetime as dt
-from controllers.loan import create_loan, exist_loan, all_loan, delete_loan, check_availabilityWithDate,check_availabilityToday,delete_all_loans, return_loan_by_book_name_and_date,return_loan_by_id
+from controllers.loan import create_loan, exist_loan, all_loan, delete_loan, check_availabilityWithDate,check_availabilityToday,delete_all_loans, return_loan_by_book_name_and_date,return_loan_by_id, update_loan, all_loan_not_returned, all_loan_by_user
 from controllers.physicalBook import get_physicalBook
 from controllers.user import get_user
 from controllers.email import *
@@ -74,7 +74,7 @@ def get_loan(id_book: int, date: dt.date, db: Session = Depends(get_db)):
     return exist
 
 #obtener todos los prestamos
-@router.get("/all_loans/", response_model=list[LoanOut], dependencies=[Depends(Portador())])
+@router.get("/all_loans/", response_model=list[LoanOut])
 def get_all_loan(db: Session = Depends(get_db)):
     """
     Endpoint para obtener todos los préstamos.
@@ -84,6 +84,16 @@ def get_all_loan(db: Session = Depends(get_db)):
         list: Lista de préstamos o un mensaje indicando que no hay préstamos.
     """
     return all_loan(db)
+
+#obtener prestamos que no se han devuelto
+@router.get("/all_loans_not_returned/", response_model=list[LoanOut])
+def get_all_loan_not_returned(db: Session = Depends(get_db)):
+    return all_loan_not_returned(db)
+
+#obtener los prestamos por usuario
+@router.get("/all_loans_by_user/{id_user}", response_model=list[LoanOut])
+def get_all_loan_by_user(id_user: int, db: Session = Depends(get_db)):
+    return all_loan_by_user(id_user, db)
 
 @router.put("/return_loan_by_book_name_and_date/", dependencies=[Depends(Portador())])
 def return_loan_by_book_name_and_date_endpoint(book_name: str, loan_date: dt.date, db: Session = Depends(get_db)):
@@ -102,7 +112,7 @@ def return_loan_by_book_name_and_date_endpoint(book_name: str, loan_date: dt.dat
     else:
         return {"message": "Loan not found"}
     
-@router.put("/return_loan_by_id/", dependencies=[Depends(Portador())])
+@router.put("/return_loan_by_id/{id_loan}")
 def return_loan_by_id_endpoint(id_loan:int, db: Session = Depends(get_db)):
     """
     Endpoint para devolver un préstamo por ID.
@@ -144,3 +154,10 @@ def delete_all_loans_route(db: Session = Depends(get_db)):
         dict: Mensaje indicando que todos los préstamos se eliminaron correctamente.
     """
     return delete_all_loans(db)
+
+@router.put("/update_loan/{loan_id}", dependencies=[Depends(Portador())])
+def update_loan_endpoint(loan_id: int, loan: Loan, db: Session = Depends(get_db)):
+    updated_loan = update_loan(loan_id, loan, db)
+    if not updated_loan:
+        return {"message": "Loan not exist"}
+    return updated_loan

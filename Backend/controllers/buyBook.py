@@ -1,6 +1,8 @@
 from schemas.buyBook import BuyBookCreate, BuyBookCreateNameBook, BuyBookOut
 from models.tables import *
 from sqlalchemy import func, text
+from typing import List, Optional
+from datetime import datetime
 
 def create_BuyDBooks(nuevo_BuyDBook: BuyBookCreate, db):
     """
@@ -12,7 +14,6 @@ def create_BuyDBooks(nuevo_BuyDBook: BuyBookCreate, db):
         CompraLibro: El objeto CompraLibro recién creado.
     """
     compLibro = CompraLibro(**nuevo_BuyDBook.dict())
-    ## Acá va la logica de consulta en la base de datos
     db.add(compLibro)
     db.commit()
     db.refresh(compLibro)
@@ -20,11 +21,37 @@ def create_BuyDBooks(nuevo_BuyDBook: BuyBookCreate, db):
 
 def create_BuyDBooks(nuevo_BuyDBook: BuyBookCreateNameBook, db):
     compLibro = CompraLibro(**nuevo_BuyDBook.dict())
-    ## Acá va la logica de consulta en la base de datos
     db.add(compLibro)
     db.commit()
     db.refresh(compLibro)
+
+    actualizar_informe_usuario(nuevo_BuyDBook.id_usuario, db)
+
     return compLibro
+
+def actualizar_informe_usuario(user_id: int, db):
+    informe_usuario = db.query(Informe).filter(Informe.id_usuario == user_id).first()
+
+    if informe_usuario:
+
+        informe_usuario.numeroComprasLibros += 1 
+
+        db.commit()
+        db.refresh(informe_usuario)
+    else:
+
+        nuevo_informe = Informe(
+            fechaGeneracion=datetime.utcnow(),
+            numeroLibrosPrestados=0,
+            numeroLibrosNoDevueltos=0, 
+            numeroComprasLibros=1,
+            id_usuario=user_id
+        )
+
+        db.add(nuevo_informe)
+        db.commit()
+        db.refresh(nuevo_informe)
+
 
 def exist_BuyDBook(id_user: int, id_dBook: int, db):
     """
@@ -60,6 +87,9 @@ def all_BuyDBooks(db):
         List[CompraLibro]: Lista que contiene todos los registros de CompraLibro.
     """
     return db.query(CompraLibro).all()
+
+def all_BuyDBooks_by_user(id_user: int, db):
+    return db.query(CompraLibro).filter(CompraLibro.id_usuario == id_user).all()
 
 def delete_BuyDBook(id: int, db):
     """
@@ -115,4 +145,19 @@ def delete_all_buy_books(db):
     except Exception as e:
         db.rollback()
         return {"message": f"An error occurred: {str(e)}"}
+    
+def get_buybookcreate(id: int, db):
+    cat = db.query(CompraLibro).filter(CompraLibro.id == id).first()
+    return cat
+
+
+def update_buybookcreate(buybookcreate_id: int, updated_buybookcreate: BuyBookCreate, db) -> Optional[BuyBookCreate]:
+        usr = get_buybookcreate(buybookcreate_id, db)
+        if usr:
+            usr.id_usuario = updated_buybookcreate.id_usuario
+            usr.id_libroDigital = updated_buybookcreate.id_libroDigital
+            db.commit()  # Guarda los cambios en la base de datos
+            db.refresh(usr)
+            return usr
+        return None
 

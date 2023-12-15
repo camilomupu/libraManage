@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends
 from schemas.subcategory import SubCategory, SubCategoryOut
 from config.db import get_db
 from sqlalchemy.orm import Session
-from controllers.subcategory import create_subcategory, exist_subcategory, all_subcategories, delete_subcategories
+from controllers.subcategory import create_subcategory, exist_subcategory, all_subcategories, delete_subcategories , update_SubCategory
 from routes.user import Portador
+from fastapi import FastAPI, Depends, HTTPException, status
 
 
 router = APIRouter()
@@ -70,3 +71,11 @@ def delete_subcategories_endpoint(id: int, db: Session = Depends(get_db)):
     if not subcategoriaDeleted:
         return {"message": "Subcategoria not exist"}
     return {"message": "Subcategoria deleted successfully", "subcategoria": SubCategory(**subcategoriaDeleted.__dict__)}
+
+#Ruta para actualizar un usuario
+@router.put("/update_subcategory/{subcategory_id}", dependencies=[Depends(Portador())])
+def update_subcategory(subcategory_id: int, subcategoria: SubCategory, db: Session = Depends(get_db)):
+    updated_subcategoria = update_SubCategory(subcategory_id, subcategoria, db)
+    if not updated_subcategoria:
+        return {"message": "Subcategoria not exist"}
+    return updated_subcategoria

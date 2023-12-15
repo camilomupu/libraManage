@@ -3,6 +3,7 @@ import boto3
 from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, File, Request
 from io import BytesIO
+from typing import List, Optional
 
 load_dotenv('.env')
 
@@ -36,3 +37,4 @@ async def upload_file(file: UploadFile = File(...)):
     #Obtiene la URL del archivo almacenado en S3
     url = f'https://{s3_bucket_name}.s3.amazonaws.com/{path}'
     return url
+

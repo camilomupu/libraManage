@@ -152,7 +152,7 @@ def get_user(correo: str, db: Session = Depends(get_db)):
 
 
 # obtener todos los usuarios
-@router.get("/all_users/", dependencies=[Depends(Portador())])
+@router.get("/all_users/")
 def get_all_users(db: Session = Depends(get_db)):
     """
     Endpoint para obtener todos los usuarios.

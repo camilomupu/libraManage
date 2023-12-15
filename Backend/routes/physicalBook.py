@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, File, UploadFile, File, HTTPException
 from schemas.physicalBook import PhysicalBook, PhysicalBookOut
 from config.db import get_db, upload_img
 from sqlalchemy.orm import Session
-from controllers.physicalBook import create_physicalBook, exist_physicalBook, all_physicalBook, delete_physicalBook, exist_user_admin, search_physical_book,register_physicalBook
+from controllers.physicalBook import create_physicalBook, exist_physicalBook, all_physicalBook, delete_physicalBook, exist_user_admin, search_physical_book,register_physicalBook, update_physicalbook
 from controllers.author import get_author
 from controllers.category import get_category
 from controllers.subcategory import get_subcategory
@@ -13,8 +13,8 @@ from routes.user import Portador
 router = APIRouter()
 
     
-@router.post("/register_physicalBooks/", dependencies=[Depends(Portador())])
-async def register_physicalBooks(correo:str,titulo:str,descripcion:str,ubicacion:str,
+@router.post("/register_physicalBooks/")
+async def register_physicalBooks(titulo:str,descripcion:str,ubicacion:str,
                   estado:str, id_autor:int, id_categoria:int, id_subcategoria:int
                   , file: UploadFile = None, url_image:str = None, db: Session = Depends(get_db)):
     """
@@ -36,8 +36,6 @@ async def register_physicalBooks(correo:str,titulo:str,descripcion:str,ubicacion
     Returns:
         dict: Mensaje indicando que el libro físico se creó correctamente.
     """
-    if not exist_user_admin(correo,db):
-        raise HTTPException(status_code=400, detail="You are not admin")
     if file is None and url_image is None:
         raise HTTPException(status_code=400, detail="You need to upload a file or url_image")
     exist = exist_physicalBook(titulo, id_autor, db)
@@ -80,7 +78,7 @@ def get_all_physicalBook(db: Session = Depends(get_db)):
     return all_physicalBook(db)
 
 #eliminar libro fisico por id
-@router.delete("/delete_physicalBook/{id}", dependencies=[Depends(Portador())])
+@router.delete("/delete_physicalBook/{id}")
 def delete_physicalBookk(id: int, db: Session = Depends(get_db)):
     """
     Endpoint para eliminar un libro físico por ID.
@@ -93,8 +91,7 @@ def delete_physicalBookk(id: int, db: Session = Depends(get_db)):
     physicalBookDeleted = delete_physicalBook(id, db)
     if not physicalBookDeleted:
         return {"message": "Physical book not exist"}
-    return {"message": "Physical book deleted successfully", 
-            "physical book": PhysicalBook(**physicalBookDeleted.__dict__)}
+    return {"message": "Physical book deleted successfully"}
     
 
 @router.get("/search_physicalBook/")
@@ -116,3 +113,11 @@ def search_physical_book_endpoint(titulo: str = None, categoria: str = None, sub
         return {"message": "No physical books found with the criteria provided"}
     
     return physicalBooks 
+
+@router.put("/update_physicalBook/{physicalBook_id}", dependencies=[Depends(Portador())])
+def update_physicalBookk(physicalBook_id: int, physicalBook: PhysicalBook, db: Session = Depends(get_db)):
+    updated_physicalBook = update_physicalbook(physicalBook_id, physicalBook, db)
+    if not updated_physicalBook:
+        return {"message": "Physical book not exist"}
+    return updated_physicalBook
+

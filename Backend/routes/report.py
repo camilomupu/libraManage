@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from schemas.report import Report, ReportOut
 from config.db import get_db
 from sqlalchemy.orm import Session
-from controllers.report import create_report, exist_report, all_report, delete_report, generate_report, generate_csv_content, generate_xlsx_content, generate_pdf_content, generate_csv_content_by_user, generate_xlsx_content_by_user, generate_pdf_content_by_user
+from controllers.report import create_report, exist_report, all_report, delete_report, generate_report, generate_csv_content, generate_xlsx_content, generate_pdf_content, generate_csv_content_by_user, generate_xlsx_content_by_user, generate_pdf_content_by_user, update_report
 from routes.user import Portador
 
 
@@ -213,3 +213,10 @@ def del_report(id: int, db: Session = Depends(get_db)):
     if not reportDeleted:
         return {"message": "Report not exist"}
     return {"message": "Report deleted successfully", "user": Report(**reportDeleted.__dict__)}
+
+@router.put("/update_report/{id}", dependencies=[Depends(Portador())])
+def update_report_endpoint(id: int, report: Report, db: Session = Depends(get_db)):
+    updated_report = update_report(id, report, db)
+    if not updated_report:
+        return {"message": "Report not exist"}
+    return updated_report

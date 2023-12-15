@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from schemas.category import Category, CategoryOut
 from config.db import get_db
 from sqlalchemy.orm import Session
-from controllers.category import create_category, exist_category, all_categories, delete_categories
+from controllers.category import create_category, exist_category, all_categories, delete_categories, update_category
 from routes.user import Portador
 
 router = APIRouter()
@@ -70,3 +70,11 @@ def delete_categoria(id: int, db: Session = Depends(get_db)):
     if not categoriaDeleted:
         return {"message": "Categoria not exist"}
     return {"message": "Categoria deleted successfully", "categoria": Category(**categoriaDeleted.__dict__)}
+
+@router.put("/update_category/{category_id}", dependencies=[Depends(Portador())])
+def update_categoria(category_id: int, categoria: Category, db: Session = Depends(get_db)):
+    updated_categoria = update_category(category_id, categoria, db)
+    if not updated_categoria:
+        return {"message": "Categoria not exist"}
+    return updated_categoria
+
