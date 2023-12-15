@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from schemas.fine import Fine, FineCreate
 from config.db import get_db
 from sqlalchemy.orm import Session
-from controllers.fine import create_fine, add_fine_automatically, exist_fine, all_fines, delete_fines, delete_all_fines, forgive_fine, pay_fine
+from controllers.fine import create_fine, add_fine_automatically, exist_fine, all_fines, delete_fines, delete_all_fines, forgive_fine, pay_fine, update_fine
 from routes.user import Portador
 
 router = APIRouter()
@@ -64,3 +64,10 @@ def delete_fine(id_fine: int, db: Session = Depends(get_db)):
 @router.delete("/delete_all_fines", dependencies=[Depends(Portador())])
 def delete_all_fines_route(db: Session = Depends(get_db)):
     return delete_all_fines(db)
+
+@router.put("/update_fine/{fine_id}", dependencies=[Depends(Portador())])
+def update_fine_endpoint(fine_id: int, fine: Fine, db: Session = Depends(get_db)):
+    updated_fine = update_fine(fine_id, fine, db)
+    if not updated_fine:
+        return {"message": "Fine not exist"}
+    return updated_fine

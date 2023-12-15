@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, Request
 from schemas.buyBook import BuyBookCreate, BuyBookOut
 from config.db import get_db
 from sqlalchemy.orm import Session
-from controllers.buyBook import create_BuyDBooks, exist_BuyDBook, all_BuyDBooks, delete_BuyDBook, get_BuysDBooks, delete_all_buy_books
+from controllers.buyBook import create_BuyDBooks, exist_BuyDBook, all_BuyDBooks, delete_BuyDBook, get_BuysDBooks, delete_all_buy_books, update_buybookcreate
 from controllers.digitalBook import get_dBook
 from controllers.user import get_user
 from fastapi.responses import HTMLResponse
@@ -55,3 +55,11 @@ def delete_buy_digital_book(id: int, db: Session = Depends(get_db)):
 @router.delete("/delete_all_buy_books", dependencies=[Depends(Portador())])
 def delete_all_buy_books_route(db: Session = Depends(get_db)):
     return delete_all_buy_books(db)
+
+
+@router.put("/update_buybookcreate/{buybook_id}", dependencies=[Depends(Portador())])
+def update_buybook(buybook_id: int, buybook: BuyBookCreate, db: Session = Depends(get_db)):
+    updated_buybook = update_buybookcreate(buybook_id, buybook, db)
+    if not updated_buybook:
+        return {"message": "Buy digital book not exist"}
+    return updated_buybook

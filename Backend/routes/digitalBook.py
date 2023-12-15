@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, File, UploadFile, File, HTTPException
 from schemas.digitalBook import DigitalBookCreate, DBookOut
 from config.db import get_db, upload_img, upload_pdfs
 from sqlalchemy.orm import Session
-from controllers.digitalBook  import create_dBook, exist_dBook, all_dBooks, delete_dBook, exist_user_admin, search_digital_book, register_digitalBook
+from controllers.digitalBook  import create_dBook, exist_dBook, all_dBooks, delete_dBook, exist_user_admin, search_digital_book, register_digitalBook, update_digitalbookcreate
 from routes.user import Portador
 
 router = APIRouter()
@@ -60,3 +60,10 @@ def search_digital_book_endpoint(titulo: str = None, categoria: str = None, subc
         return {"message": "No digital books were found with the criteria provided"}
     
     return digitalBooks
+
+@router.put("/update_digitalbookcreate/{digitalBook_id}", dependencies=[Depends(Portador())])
+def update_digital_book(digitalBook_id: int, digitalBook: DigitalBookCreate, db: Session = Depends(get_db)):
+    updated_digitalBook = update_digitalbookcreate(digitalBook_id, digitalBook, db)
+    if not updated_digitalBook:
+        return {"message": "Digital book not exist"}
+    return updated_digitalBook

@@ -6,6 +6,7 @@ from schemas.report import Report
 from models.tables import Informe, Usuario
 from sqlalchemy import func, text
 from reportlab.pdfgen import canvas
+from typing import List, Optional
 
 def create_report(new_report: Report, db):
     report = Informe(**new_report.dict())
@@ -192,3 +193,22 @@ def generate_pdf_content_by_user(report_data, db):
     pdf.save()
 
     return pdf_buffer
+
+def get_report(id: int, db):
+    cat = db.query(Report).filter(Report.id == id).first()
+    return cat
+
+
+def update_report(report_id: int, updated_report: Report, db) -> Optional[Report]:
+        usr = get_report(report_id, db)
+        if usr:
+            usr.fechaGeneracion = updated_report.fechaGeneracion
+            usr.numeroLibrosPrestados = updated_report.numeroLibrosPrestados
+            usr.numeroComprasLibros = updated_report.numeroComprasLibros
+            usr.numeroLibrosNoDevueltos = updated_report.numeroLibrosNoDevueltos
+            db.commit()  # Guarda los cambios en la base de datos
+            db.refresh(usr)
+            return usr
+        return None
+
+

@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, File, UploadFile, File, HTTPException
 from schemas.physicalBook import PhysicalBook, PhysicalBookOut
 from config.db import get_db, upload_img
 from sqlalchemy.orm import Session
-from controllers.physicalBook import create_physicalBook, exist_physicalBook, all_physicalBook, delete_physicalBook, exist_user_admin, search_physical_book,register_physicalBook
+from controllers.physicalBook import create_physicalBook, exist_physicalBook, all_physicalBook, delete_physicalBook, exist_user_admin, search_physical_book,register_physicalBook, update_physicalbook
 from controllers.author import get_author
 from controllers.category import get_category
 from controllers.subcategory import get_subcategory
@@ -63,3 +63,11 @@ def search_physical_book_endpoint(titulo: str = None, categoria: str = None, sub
         return {"message": "No physical books found with the criteria provided"}
     
     return physicalBooks 
+
+@router.put("/update_physicalBook/{physicalBook_id}", dependencies=[Depends(Portador())])
+def update_physicalBookk(physicalBook_id: int, physicalBook: PhysicalBook, db: Session = Depends(get_db)):
+    updated_physicalBook = update_physicalbook(physicalBook_id, physicalBook, db)
+    if not updated_physicalBook:
+        return {"message": "Physical book not exist"}
+    return updated_physicalBook
+

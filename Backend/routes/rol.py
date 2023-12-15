@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from schemas.rol import RolCreate, RolOut
 from config.db import get_db
 from sqlalchemy.orm import Session
-from controllers.rol import create_rol, exist_rol, all_roles, delete_rol
+from controllers.rol import create_rol, exist_rol, all_roles, delete_rol, update_rolcreate
 from routes.user import Portador
 
 router = APIRouter()
@@ -39,3 +39,10 @@ def delete_roles(id: int, db: Session = Depends(get_db)):
     if not rolDeleted:
         return {"message": "User not exist"}
     return {"message": "User deleted successfully", "user": RolOut(**rolDeleted.__dict__)}
+
+@router.put("/update_rolcreate/{rol_id}", dependencies=[Depends(Portador())])
+def update_rol(rol_id: int, rol: RolCreate, db: Session = Depends(get_db)):
+    updated_rol = update_rolcreate(rol_id, rol, db)
+    if not updated_rol:
+        return {"message": "Rol not exist"}
+    return updated_rol

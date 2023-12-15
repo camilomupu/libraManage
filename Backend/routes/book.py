@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, File, UploadFile, File, HTTPException
 from config.db import get_db
 from sqlalchemy.orm import Session
-from controllers.physicalBook import search_physical_book, all_physicalBook
-from controllers.digitalBook import search_digital_book, all_dBooks
+from controllers.physicalBook import search_physical_book, all_physicalBook , update_physicalbook
+from controllers.digitalBook import search_digital_book, all_dBooks, update_digitalbookcreate
 
 
 

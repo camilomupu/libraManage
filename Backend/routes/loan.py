@@ -3,7 +3,7 @@ from schemas.loan import Loan, LoanOut, loanDueDate
 from config.db import get_db
 from sqlalchemy.orm import Session
 import datetime as dt
-from controllers.loan import create_loan, exist_loan, all_loan, delete_loan, check_availabilityWithDate,check_availabilityToday,delete_all_loans, return_loan_by_book_name_and_date,return_loan_by_id
+from controllers.loan import create_loan, exist_loan, all_loan, delete_loan, check_availabilityWithDate,check_availabilityToday,delete_all_loans, return_loan_by_book_name_and_date,return_loan_by_id, update_loan
 from controllers.physicalBook import get_physicalBook
 from controllers.user import get_user
 from controllers.email import *
@@ -78,3 +78,10 @@ def delete_loan_id(id:int, db:Session = Depends(get_db)):
 @router.delete("/delete_all_loans", dependencies=[Depends(Portador())])
 def delete_all_loans_route(db: Session = Depends(get_db)):
     return delete_all_loans(db)
+
+@router.put("/update_loan/{loan_id}", dependencies=[Depends(Portador())])
+def update_loan_endpoint(loan_id: int, loan: Loan, db: Session = Depends(get_db)):
+    updated_loan = update_loan(loan_id, loan, db)
+    if not updated_loan:
+        return {"message": "Loan not exist"}
+    return updated_loan

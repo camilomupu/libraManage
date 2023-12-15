@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from fastapi import UploadFile, File
 from config.db import upload_img, upload_pdfs
 from sqlalchemy.exc import NoResultFound
+from typing import List, Optional
 
 def create_dBook(nuevo_dBook: DigitalBookCreate, db):
     libro = LibroDigital(**nuevo_dBook.dict())
@@ -88,3 +89,24 @@ def search_digital_book(titulo: str = None, categoria: str = None, subcategoria:
 
     digitalBooks = query.all()
     return digitalBooks
+
+def get_digitalbookcreate(id: int, db):
+    cat = db.query(LibroDigital).filter(LibroDigital.id == id).first()
+    return cat
+
+
+def update_digitalbookcreate(digitalbookcreate_id: int, updated_digitalbookcreate: DigitalBookCreate, db) -> Optional[DigitalBookCreate]:
+        usr = get_digitalbookcreate(digitalbookcreate_id, db)
+        if usr:
+            usr.titulo = updated_digitalbookcreate.titulo
+            usr.descripcion = updated_digitalbookcreate.descripcion
+            usr.portada = updated_digitalbookcreate.portada
+            usr.link_Libro = updated_digitalbookcreate.link_Libro
+            usr.id_autor = updated_digitalbookcreate.id_autor
+            usr.id_categoria = updated_digitalbookcreate.id_categoria
+            usr.id_subcategoria = updated_digitalbookcreate.id_subcategoria
+            usr.precio = updated_digitalbookcreate.precio
+            db.commit()  # Guarda los cambios en la base de datos
+            db.refresh(usr)
+            return usr
+        return None

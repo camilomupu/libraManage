@@ -1,6 +1,7 @@
 from schemas.buyBook import BuyBookCreate, BuyBookCreateNameBook, BuyBookOut
 from models.tables import *
 from sqlalchemy import func, text
+from typing import List, Optional
 
 def create_BuyDBooks(nuevo_BuyDBook: BuyBookCreate, db):
     compLibro = CompraLibro(**nuevo_BuyDBook.dict())
@@ -68,4 +69,19 @@ def delete_all_buy_books(db):
     except Exception as e:
         db.rollback()
         return {"message": f"An error occurred: {str(e)}"}
+    
+def get_buybookcreate(id: int, db):
+    cat = db.query(CompraLibro).filter(CompraLibro.id == id).first()
+    return cat
+
+
+def update_buybookcreate(buybookcreate_id: int, updated_buybookcreate: BuyBookCreate, db) -> Optional[BuyBookCreate]:
+        usr = get_buybookcreate(buybookcreate_id, db)
+        if usr:
+            usr.id_usuario = updated_buybookcreate.id_usuario
+            usr.id_libroDigital = updated_buybookcreate.id_libroDigital
+            db.commit()  # Guarda los cambios en la base de datos
+            db.refresh(usr)
+            return usr
+        return None
 

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from schemas.author import Author, AuthorOut
 from config.db import get_db
 from sqlalchemy.orm import Session
-from controllers.author import create_author, exist_author, all_authors, delete_authors
+from controllers.author import create_author, exist_author, all_authors, delete_authors, update_author
 from routes.user import Portador
 
 
@@ -38,3 +38,10 @@ def delete_authorss(id: int, db: Session = Depends(get_db)):
     if not authorDeleted:
         return {"message": "author not exist"}
     return {"message": "author deleted successfully"}
+
+@router.put("/update_author/{author_id}", dependencies=[Depends(Portador())])
+def update_authorr(author_id: int, author: Author, db: Session = Depends(get_db)):
+    updated_author = update_author(author_id, author, db)
+    if not updated_author:
+        return {"message": "author not exist"}
+    return updated_author

@@ -1,6 +1,7 @@
 from schemas.rol import RolCreate, RolOut
 from models.tables import Rol
 from sqlalchemy import func, text
+from typing import List, Optional
 
 def create_rol(new_rol: RolCreate, db):
     rol = Rol(**new_rol.dict())
@@ -25,3 +26,16 @@ def delete_rol(id: int, db):
     print(max_id)
     db.commit()
     return delRol
+
+def get_rolcreate(id: int, db):
+    cat = db.query(Rol).filter(Rol.id == id).first()
+    return cat
+
+def update_rolcreate(rolcreate_id: int, updated_rolcreate: RolCreate, db) -> Optional[RolCreate]:
+        usr = get_rolcreate(rolcreate_id, db)
+        if usr:
+            usr.nombre = updated_rolcreate.nombre
+            db.commit()  # Guarda los cambios en la base de datos
+            db.refresh(usr)
+            return usr
+        return None
