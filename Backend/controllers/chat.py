@@ -61,6 +61,13 @@ def obtener_estimadoVentas(db):
 
 #Se va a utilizar para pasarle las fechas de los prestamos al chatgpt y que las interprete obteniendo el numero de libros que se van a prestar
 def obtener_fechasPrestamos(db):
+    """
+    Obtiene las fechas de préstamo de la base de datos.
+    Args:
+        db: Sesión de la base de datos.
+    Returns:
+        List[str]: Lista de fechas de préstamo en formato de cadena.
+    """
     # Consulta para obtener las fechas de préstamo desde la tabla de préstamos
     fechas_prestamo = db.query(Prestamo.fechaPrestamo).all()
 
@@ -71,6 +78,13 @@ def obtener_fechasPrestamos(db):
 
 #se va a utilizar para pasar las fechas y estado del prestamo al chatgpt y que las interprete obteniendo el numero de libros que no se van a entregar
 def obtener_estadoPrestamos(db):
+    """
+    Obtiene la información de las fechas de vencimiento y el estado de los préstamos.
+    Args:
+        db: Sesión de la base de datos.
+    Returns:
+        List[Dict[str, Union[str, bool]]]: Lista de diccionarios con información de los préstamos.
+    """
     # Consulta para obtener la información de préstamos desde la tabla de préstamos
     prestamos_info = db.query(Prestamo.fechaVencimiento, Prestamo.devuelto).all()
 
@@ -82,6 +96,14 @@ def obtener_estadoPrestamos(db):
 #Pregunta respuesta
 @router.get("/consultaChatGPT/")
 def pregunta_chatGPT(pregunta: str, db: Session = Depends(get_db)):
+    """
+    Interactúa con el modelo de lenguaje GPT-3.5 Turbo de OpenAI para obtener respuestas a preguntas específicas de la app.
+    Args:
+        pregunta (str): Pregunta del usuario.
+        db: Sesión de la base de datos.
+    Returns:
+        Dict[str, str]: Respuesta del modelo de lenguaje.
+    """
     #Obtenemos las fechas de los prestamos
     fechas_prestamo = obtener_fechasPrestamos(db)
     #Obtenemos las fechas y el estado de los prestamos

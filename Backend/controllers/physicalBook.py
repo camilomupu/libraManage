@@ -6,6 +6,14 @@ from fastapi import UploadFile, File
 from config.db import upload_img
 
 def create_physicalBook(new_book: PhysicalBook, db):
+    """
+    Crea un nuevo libro físico en la base de datos.
+    Args:
+        new_book (PhysicalBook): Objeto que contiene la información del nuevo libro físico.
+        db: Sesión de la base de datos.
+    Returns:
+        LibroFisico: Objeto del libro físico creado.
+    """
     book = LibroFisico(**new_book.__dict__)
     db.add(book)
     db.commit()
@@ -13,17 +21,49 @@ def create_physicalBook(new_book: PhysicalBook, db):
     return book
 
 def exist_physicalBook(titulo: str, id_author: int, db):
+    """
+    Verifica la existencia de un libro físico en la base de datos por su título y el ID del autor.
+    Args:
+        titulo (str): Título del libro físico.
+        id_author (int): ID del autor del libro físico.
+        db: Sesión de la base de datos.
+    Returns:
+        LibroFisico or None: Objeto del libro físico si existe, None si no se encuentra.
+    """
     book = db.query(LibroFisico).filter((LibroFisico.titulo == titulo) & (LibroFisico.id_autor == id_author)).first()
     return book
 
 def get_physicalBook(id: int, db):
+    """
+    Obtiene un libro físico de la base de datos por su ID.
+    Args:
+        id (int): ID del libro físico.
+        db: Sesión de la base de datos.
+    Returns:
+        LibroFisico or None: Objeto del libro físico si existe, None si no se encuentra.
+    """
     book = db.query(LibroFisico).filter(LibroFisico.id == id).first()
     return book
 
 def all_physicalBook(db):
+    """
+    Obtiene todos los libros físicos de la base de datos.
+    Args:
+        db: Sesión de la base de datos.
+    Returns:
+        list: Lista de objetos de libros físicos.
+    """
     return db.query(LibroFisico).all()
 
 def delete_physicalBook(id: int, db):
+    """
+    Elimina un libro físico de la base de datos por su ID.
+    Args:
+        id (int): ID del libro físico.
+        db: Sesión de la base de datos.
+    Returns:
+        LibroFisico or None: Objeto del libro físico eliminado si existe, None si no se encuentra.
+    """
     book = db.query(LibroFisico).filter(LibroFisico.id == id).first()
     db.delete(book)
     db.commit()
@@ -34,6 +74,16 @@ def delete_physicalBook(id: int, db):
     return book
     
 def exist_user_admin(correo:str, db): #Verificamos si el usuario es administrador
+    """
+    Verifica si un usuario tiene el rol de administrador.
+
+    Args:
+        correo (str): Correo electrónico del usuario.
+        db: Sesión de la base de datos.
+
+    Returns:
+        bool: True si el usuario es administrador, False de lo contrario.
+    """
     user = db.query(Usuario).filter(Usuario.correo == correo).first()
     if user is None: #Verificamos si el usuario existe
         return False
@@ -49,6 +99,21 @@ def exist_user_admin(correo:str, db): #Verificamos si el usuario es administrado
 
 async def register_physicalBook(titulo: str, descripcion: str, ubicacion: str, estado: str, id_autor: int,
                         id_categoria: int, id_subcategoria: int, file: UploadFile = None, url_imagen: str = None):
+    """
+    Registra un nuevo libro físico en la base de datos.
+    Args:
+        titulo (str): Título del libro físico.
+        descripcion (str): Descripción del libro físico.
+        ubicacion (str): Ubicación física del libro.
+        estado (str): Estado del libro físico.
+        id_autor (int): ID del autor del libro físico.
+        id_categoria (int): ID de la categoría del libro físico.
+        id_subcategoria (int): ID de la subcategoría del libro físico.
+        file (UploadFile, optional): Archivo de imagen del libro físico. Defaults to None.
+        url_imagen (str, optional): URL de la imagen del libro físico. Defaults to None.
+    Returns:
+        PhysicalBook: Objeto del libro físico registrado.
+    """
     #verificar si se cargo el file
     if file is not None:
         url_img = await upload_img(file)
@@ -63,6 +128,17 @@ async def register_physicalBook(titulo: str, descripcion: str, ubicacion: str, e
     
 
 def search_physical_book(titulo: str = None, categoria: str = None, subcategoria: str = None, autor: str = None, db: Session = None):
+    """
+    Realiza una búsqueda de libros físicos en la base de datos con filtros opcionales.
+    Args:
+        titulo (str, optional): Título del libro físico. Defaults to None.
+        categoria (str, optional): Categoría del libro físico. Defaults to None.
+        subcategoria (str, optional): Subcategoría del libro físico. Defaults to None.
+        autor (str, optional): Autor del libro físico. Defaults to None.
+        db: Sesión de la base de datos.
+    Returns:
+        list: Lista de objetos de libros físicos que cumplen con los criterios de búsqueda.
+    """
     query = db.query(LibroFisico)
 
     if titulo:

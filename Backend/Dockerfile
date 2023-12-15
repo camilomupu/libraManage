@@ -1,5 +1,5 @@
 # Usa una imagen base de Python
-FROM python:3.10-slim-buster
+FROM python:3.11-slim-buster
 
 # Copia los archivos de tu proyecto al contenedor
 COPY . /app
@@ -14,4 +14,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 8000
 
 # Comando para ejecutar la aplicación
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "80"]

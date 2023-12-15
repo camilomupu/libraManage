@@ -15,6 +15,14 @@ router = APIRouter()
 #nuevo buyBook pruebas
 @router.post("/new_buyBook/", dependencies=[Depends(Portador())])
 async def create_new_buy_digital_book(buyBook: BuyBookCreate, db: Session = Depends(get_db)):
+    """
+    Crea una nueva compra de libro digital y envía una confirmación por correo electrónico.
+    Args:
+        buyBook (BuyBookCreate): Datos de la compra de libro digital.
+        db (Session): Sesión de la base de datos.
+    Returns:
+        dict: Mensaje indicando si la compra se creó exitosamente o si ya existe una compra para el libro digital.
+    """
     buyExist = exist_BuyDBook(buyBook.id_usuario, buyBook.id_libroDigital, db)
     if buyExist:
        return {"message": "Buy digital book already exist"}
@@ -33,6 +41,16 @@ async def create_new_buy_digital_book(buyBook: BuyBookCreate, db: Session = Depe
 #obtener compra por id del usuario y id del libro digital
 @router.get("/buyBook/{id_user}/{id_dBook}", dependencies=[Depends(Portador())])
 def get_buy_digital_book(id_user: int ,id_dBook: int, db: Session = Depends(get_db)):
+    """
+    Obtiene los detalles de una compra de libro digital.
+    Args:
+        id_user (int): ID del usuario.
+        id_dBook (int): ID del libro digital.
+        db (Session): Sesión de la base de datos.
+    Returns:
+        BuyBookOut or dict: Detalles de la compra de libro digital si existe.
+        Mensaje indicando que la compra de libro digital no existe si no se encuentra.
+    """
     exist = exist_BuyDBook(id_user, id_dBook, db)
     if not exist:
         return {"message": "Buy digital book not exist"}
@@ -42,11 +60,26 @@ def get_buy_digital_book(id_user: int ,id_dBook: int, db: Session = Depends(get_
 #obtener todos los buyBooks
 @router.get("/all_buyBooks/", response_model=list[BuyBookCreate])
 def get_all_buy_digital_books(db: Session = Depends(get_db)):
+    """
+    Obtiene la lista de todas las compras de libros digitales.
+    Args:
+        db (Session): Sesión de la base de datos.
+    Returns:
+        list[BuyBookCreate]: Lista de compras de libros digitales.
+    """
     return all_BuyDBooks(db)
 
 #eliminar buyBooks por id
 @router.delete("/delete_buyBook/{id}", dependencies=[Depends(Portador())])
 def delete_buy_digital_book(id: int, db: Session = Depends(get_db)):
+    """
+    Elimina una compra de libro digital por su ID.
+    Args:
+        id (int): ID de la compra de libro digital.
+        db (Session): Sesión de la base de datos.
+    Returns:
+        dict: Mensaje indicando si la compra de libro digital se eliminó exitosamente o si no existe.
+    """
     buyBookDeleted = delete_BuyDBook(id, db)
     if not buyBookDeleted:
         return {"message": "Buy digital book not exist"}
@@ -54,4 +87,11 @@ def delete_buy_digital_book(id: int, db: Session = Depends(get_db)):
 
 @router.delete("/delete_all_buy_books", dependencies=[Depends(Portador())])
 def delete_all_buy_books_route(db: Session = Depends(get_db)):
+    """
+    Elimina todas las compras de libros digitales.
+    Args:
+        db (Session): Sesión de la base de datos.
+    Returns:
+        dict: Mensaje indicando si todas las compras de libros digitales se eliminaron exitosamente.
+    """
     return delete_all_buy_books(db)

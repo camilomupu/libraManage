@@ -15,13 +15,24 @@ s3 = boto3.resource(
 )
 
 async def upload_file(file: UploadFile = File(...)):
+    """
+    Sube un archivo al servicio de almacenamiento S3 y devuelve la URL del archivo.
+    Args:
+        file (UploadFile): Archivo a ser subido.
+    Returns:
+        str: URL del archivo almacenado en S3.
+    """
+    # Nombre del bucket en S3
     s3_bucket_name = 'libramanage'
+    # Carpeta en la que se almacenarán los archivos
     folder_name = "pdfs"
-    #Si el nombre tiene un espacio en la mitad se reemplaza por +
+    # Reemplaza los espacios en el nombre del archivo con '+'
     file_name = file.filename.replace(" ", "+")
+    # Ruta completa del archivo en S3
     path = f'{folder_name}/{file_name}'
+    # Sube el archivo al bucket de S3
     s3.Bucket(s3_bucket_name).put_object(Key= path, Body=file.file)
     
-    #obtener el url del archivo
+    #Obtiene la URL del archivo almacenado en S3
     url = f'https://{s3_bucket_name}.s3.amazonaws.com/{path}'
     return url

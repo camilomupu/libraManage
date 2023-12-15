@@ -14,6 +14,14 @@ router = APIRouter()
 #nuevo prestamo
 @router.post("/new_loan/", dependencies=[Depends(Portador())])
 async def create_new_loan(loan: Loan, db: Session = Depends(get_db)):
+    """
+    Endpoint para crear un nuevo préstamo.
+    Args:
+        loan (Loan): Datos del préstamo.
+        db (Session): Sesión de la base de datos.
+    Returns:
+        dict: Mensaje indicando que el préstamo se creó correctamente.
+    """
     exist = exist_loan(loan.id_usuario, loan.id_libroFisico, loan.fechaPrestamo, db)
     if exist:
         return {"message": "This loan is already registered"}
@@ -34,6 +42,16 @@ async def create_new_loan(loan: Loan, db: Session = Depends(get_db)):
 #obtener prestamo por id  
 @router.get("/loan/{id_user}/{id_book}/{date}", dependencies=[Depends(Portador())])
 def get_loan(id_user: int, id_book: int, date_loan: dt.date, db: Session = Depends(get_db)):
+    """
+    Endpoint para obtener los detalles de un préstamo por ID de usuario, ID de libro y fecha.
+    Args:
+        id_user (int): ID del usuario.
+        id_book (int): ID del libro físico.
+        date_loan (date): Fecha del préstamo.
+        db (Session): Sesión de la base de datos.
+    Returns:
+        dict: Detalles del préstamo o un mensaje indicando que el préstamo no existe.
+    """
     exist = exist_loan(id_user, id_book, date_loan, db)
     if not exist:
         return {"message": "Loan not exist"}
@@ -41,6 +59,15 @@ def get_loan(id_user: int, id_book: int, date_loan: dt.date, db: Session = Depen
 
 @router.get("/check_availability/{id_book}/{date}")
 def get_loan(id_book: int, date: dt.date, db: Session = Depends(get_db)):
+    """
+    Endpoint para verificar la disponibilidad de un libro en una fecha específica.
+    Args:
+        id_book (int): ID del libro físico.
+        date (date): Fecha a verificar.
+        db (Session): Sesión de la base de datos.
+    Returns:
+        dict: Mensaje indicando si el libro está disponible o no.
+    """
     exist = check_availabilityWithDate(id_book, date, db)
     if not exist:
         return {"message": "Loan not exist"}
@@ -49,10 +76,26 @@ def get_loan(id_book: int, date: dt.date, db: Session = Depends(get_db)):
 #obtener todos los prestamos
 @router.get("/all_loans/", response_model=list[LoanOut], dependencies=[Depends(Portador())])
 def get_all_loan(db: Session = Depends(get_db)):
+    """
+    Endpoint para obtener todos los préstamos.
+    Args:
+        db (Session): Sesión de la base de datos.
+    Returns:
+        list: Lista de préstamos o un mensaje indicando que no hay préstamos.
+    """
     return all_loan(db)
 
 @router.put("/return_loan_by_book_name_and_date/", dependencies=[Depends(Portador())])
 def return_loan_by_book_name_and_date_endpoint(book_name: str, loan_date: dt.date, db: Session = Depends(get_db)):
+    """
+    Endpoint para devolver un préstamo por nombre de libro y fecha.
+    Args:
+        book_name (str): Nombre del libro físico.
+        loan_date (date): Fecha del préstamo.
+        db (Session): Sesión de la base de datos.
+    Returns:
+        dict: Detalles del préstamo devuelto o un mensaje indicando que el préstamo no se encontró.
+    """
     returned_loan = return_loan_by_book_name_and_date(book_name, loan_date, db)
     if returned_loan:
         return returned_loan
@@ -61,6 +104,14 @@ def return_loan_by_book_name_and_date_endpoint(book_name: str, loan_date: dt.dat
     
 @router.put("/return_loan_by_id/", dependencies=[Depends(Portador())])
 def return_loan_by_id_endpoint(id_loan:int, db: Session = Depends(get_db)):
+    """
+    Endpoint para devolver un préstamo por ID.
+    Args:
+        id_loan (int): ID del préstamo.
+        db (Session): Sesión de la base de datos.
+    Returns:
+        dict: Detalles del préstamo devuelto o un mensaje indicando que el préstamo no se encontró.
+    """
     returned_loan = return_loan_by_id(id_loan, db)
     if returned_loan:
         return returned_loan
@@ -70,6 +121,14 @@ def return_loan_by_id_endpoint(id_loan:int, db: Session = Depends(get_db)):
 #eliminar prestamo por id
 @router.delete("/delete_loan/{id}", dependencies=[Depends(Portador())])
 def delete_loan_id(id:int, db:Session = Depends(get_db)):
+    """
+    Endpoint para eliminar un préstamo por ID.
+    Args:
+        id (int): ID del préstamo.
+        db (Session): Sesión de la base de datos.
+    Returns:
+        dict: Mensaje indicando que el préstamo se eliminó correctamente o que el préstamo no existe.
+    """
     loanDeleted = delete_loan(id, db)
     if not loanDeleted:
         return {"message": "Loan not exist"}
@@ -77,4 +136,11 @@ def delete_loan_id(id:int, db:Session = Depends(get_db)):
 
 @router.delete("/delete_all_loans", dependencies=[Depends(Portador())])
 def delete_all_loans_route(db: Session = Depends(get_db)):
+    """
+    Endpoint para eliminar todos los préstamos.
+    Args:
+        db (Session): Sesión de la base de datos.
+    Returns:
+        dict: Mensaje indicando que todos los préstamos se eliminaron correctamente.
+    """
     return delete_all_loans(db)

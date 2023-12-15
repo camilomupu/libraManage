@@ -15,6 +15,14 @@ router = APIRouter()
 #crear informe
 @router.post("/reportcreate/", dependencies=[Depends(Portador())])
 def create_new_report(new_report: Report, db: Session = Depends(get_db)):
+    """
+    Endpoint para crear un nuevo informe.
+    Args:
+        new_report (Report): Datos del informe.
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        dict: Mensaje indicando que el informe se creó correctamente.
+    """
     report = create_report(new_report, db)
     #return report
     return {"message": "Reporte created successfully"}
@@ -22,11 +30,26 @@ def create_new_report(new_report: Report, db: Session = Depends(get_db)):
 #obtener todos los informes
 @router.get("/report/",response_model=list[Report])
 def get_all_report(db: Session = Depends(get_db)):
+    """
+    Endpoint para obtener todos los informes.
+    Args:
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        list: Lista de informes o mensaje indicando que no hay informes.
+    """
     return all_report(db)
 
 #obtener informe por id
 @router.get("/report/{id}", dependencies=[Depends(Portador())])
 def get_report(id: int, db: Session = Depends(get_db)):
+    """
+    Endpoint para obtener un informe por su ID.
+    Args:
+        id (int): ID del informe.
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        dict: Detalles del informe o mensaje indicando que no existe.
+    """
     exist = exist_report(id, db)
     if not exist:
         return {"message": "Report not exist"}
@@ -36,10 +59,24 @@ def get_report(id: int, db: Session = Depends(get_db)):
 #generar reporte
 @router.get("/report/generate/", dependencies=[Depends(Portador())])
 def generate_report_csv(db: Session = Depends(get_db)):
+    """
+    Endpoint para generar un informe en formato CSV.
+    Args:
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        dict: Mensaje indicando que el informe se generó correctamente o que no hay datos.
+    """
     return generate_report(db)
 
 @router.get("/report/download-csv/", dependencies=[Depends(Portador())])
 def generate_report_csv(db: Session = Depends(get_db)):
+    """
+    Endpoint para descargar un informe en formato CSV.
+    Args:
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        Response: Archivo CSV descargable o mensajes de error.
+    """
     report_data = generate_report(db)
 
     if report_data is None:
@@ -54,6 +91,13 @@ def generate_report_csv(db: Session = Depends(get_db)):
 
 @router.get("/report/download-csv-all-users/")
 def generate_report_csv(db: Session = Depends(get_db)):
+    """
+    Endpoint para descargar un informe de todos los usuarios en formato CSV.
+    Args:
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        Response: Archivo CSV descargable o mensajes de error.
+    """
     report_data = all_report(db)
 
     if report_data is None:
@@ -69,6 +113,13 @@ def generate_report_csv(db: Session = Depends(get_db)):
 #generar xlsx
 @router.get("/report/download-xlsx/", dependencies=[Depends(Portador())])
 def generate_report_xlsx(db: Session = Depends(get_db)):
+    """
+    Endpoint para descargar un informe en formato XLSX.
+    Args:
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        Response: Archivo XLSX descargable o mensajes de error.
+    """
     report_data = generate_report(db)
 
     if report_data is None:
@@ -84,6 +135,13 @@ def generate_report_xlsx(db: Session = Depends(get_db)):
 #generar xlsx por usuario
 @router.get("/report/download-xlsx-all-users/")
 def generate_report_xlsx(db: Session = Depends(get_db)):
+    """
+    Endpoint para descargar un informe de todos los usuarios en formato XLSX.
+    Args:
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        Response: Archivo XLSX descargable o mensajes de error.
+    """
     report_data = all_report(db)
 
     if report_data is None:
@@ -99,6 +157,13 @@ def generate_report_xlsx(db: Session = Depends(get_db)):
 #generar pdf
 @router.get("/report/download-pdf/", dependencies=[Depends(Portador())])
 def generate_report_pdf(db: Session = Depends(get_db)):
+    """
+    Endpoint para descargar un informe en formato PDF.
+    Args:
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        Response: Archivo PDF descargable o mensajes de error.
+    """
     report_data = generate_report(db)
 
     if report_data is None:
@@ -114,6 +179,13 @@ def generate_report_pdf(db: Session = Depends(get_db)):
 #generar pdf por usuario
 @router.get("/report/download-pdf-all-users/")
 def generate_report_pdf(db: Session = Depends(get_db)):
+    """
+    Endpoint para generar y descargar un informe en formato PDF para todos los usuarios.
+    Args:
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        Response: Archivo PDF descargable o mensajes de error.
+    """
     report_data = all_report(db)
 
     if report_data is None:
@@ -129,6 +201,14 @@ def generate_report_pdf(db: Session = Depends(get_db)):
 #eliminar informe por id
 @router.delete("/report/delete/{id}", dependencies=[Depends(Portador())])
 def del_report(id: int, db: Session = Depends(get_db)):
+    """
+    Endpoint para eliminar un informe por su ID.
+    Args:
+        id (int): ID del informe.
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        dict: Mensaje indicando que el informe se eliminó correctamente o que no existe.
+    """
     reportDeleted = delete_report(id, db)
     if not reportDeleted:
         return {"message": "Report not exist"}

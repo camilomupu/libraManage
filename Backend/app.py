@@ -9,10 +9,7 @@ Base.metadata.create_all(bind=engine)
 #colocar nombre
 app = FastAPI(title="Libra Tech", description="API para el manejo de una biblioteca", version="1.0.0")
 
-origins = [
-    
-    "http://localhost:3000",
-]
+origins = ['*']
 
 app.add_middleware(
     CORSMiddleware,

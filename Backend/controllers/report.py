@@ -8,6 +8,14 @@ from sqlalchemy import func, text
 from reportlab.pdfgen import canvas
 
 def create_report(new_report: Report, db):
+    """
+    Crea un nuevo informe en la base de datos.
+    Args:
+        new_report (Report): Objeto que contiene la información del nuevo informe.
+        db: Sesión de la base de datos.
+    Returns:
+        Report: Objeto del informe creado.
+    """
     report = Informe(**new_report.dict())
     db.add(report)
     db.commit()
@@ -15,13 +23,36 @@ def create_report(new_report: Report, db):
     return report
 
 def exist_report(id: int, db):
+    """
+    Verifica la existencia de un informe en la base de datos por su ID.
+    Args:
+        id (int): ID del informe.
+        db: Sesión de la base de datos.
+    Returns:
+        Report or None: Objeto del informe si existe, None si no se encuentra.
+    """
     report = db.query(Informe).filter(Informe.id == id).first()
     return report
 
 def all_report(db):
+    """
+    Obtiene todos los informes de la base de datos.
+    Args:
+        db: Sesión de la base de datos.
+    Returns:
+        list: Lista de objetos de informes.
+    """
     return db.query(Informe).all()
 
 def delete_report(id: int, db):
+    """
+    Elimina un informe de la base de datos por su ID.
+    Args:
+        id (int): ID del informe.
+        db: Sesión de la base de datos.
+    Returns:
+        Report or None: Objeto del informe eliminado si existe, None si no se encuentra.
+    """
     delReport = db.query(Informe).filter(Informe.id == id).first()
     db.delete(delReport)
     db.commit()
@@ -32,7 +63,13 @@ def delete_report(id: int, db):
     return delReport
 
 def generate_report(db):
-    
+    """
+    Genera un informe general a partir de los datos almacenados en la base de datos.
+    Args:
+        db: Sesión de la base de datos.
+    Returns:
+        dict: Diccionario con la información del informe general.
+    """
     fecha_generacion = dt.datetime.now()
     fecha_formateada = fecha_generacion.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -61,6 +98,13 @@ def generate_report(db):
         }
 
 def generate_csv_content(report_data):
+    """
+    Genera el contenido de un archivo CSV a partir de los datos de un informe.
+    Args:
+        report_data (dict): Diccionario con la información del informe.
+    Returns:
+        StringIO: Buffer de texto con el contenido del archivo CSV.
+    """
     csv_buffer = StringIO()
     csv_writer = csv.writer(csv_buffer)
 
@@ -71,6 +115,14 @@ def generate_csv_content(report_data):
     return csv_buffer
 
 def generate_csv_content_by_user(report_data, db):
+    """
+    Genera el contenido de un archivo CSV por usuario a partir de los datos de informes.
+    Args:
+        report_data (list): Lista de objetos de informes.
+        db: Sesión de la base de datos.
+    Returns:
+        StringIO: Buffer de texto con el contenido del archivo CSV.
+    """
     csv_buffer = StringIO()
     csv_writer = csv.writer(csv_buffer)
     csv_writer.writerow(["Fecha Generacion", "Libros Prestados", "Libros Comprados", "Libros No Devueltos", "Usuario"])
@@ -90,6 +142,13 @@ def generate_csv_content_by_user(report_data, db):
     return csv_buffer
 
 def generate_xlsx_content(report_data):
+    """
+    Genera el contenido de un archivo XLSX a partir de los datos de un informe.
+    Args:
+        report_data (dict): Diccionario con la información del informe.
+    Returns:
+        BytesIO: Buffer de bytes con el contenido del archivo XLSX.
+    """
     wb = openpyxl.Workbook()
     ws = wb.active
 
@@ -103,6 +162,14 @@ def generate_xlsx_content(report_data):
     return xlsx_buffer
 
 def generate_xlsx_content_by_user(report_data, db):
+    """
+    Genera el contenido de un archivo XLSX por usuario a partir de los datos de informes.
+    Args:
+        report_data (list): Lista de objetos de informes.
+        db: Sesión de la base de datos.
+    Returns:
+        BytesIO: Buffer de bytes con el contenido del archivo XLSX.
+    """
     wb = openpyxl.Workbook()
     ws = wb.active
 
@@ -126,6 +193,13 @@ def generate_xlsx_content_by_user(report_data, db):
     return xlsx_buffer
 
 def generate_pdf_content(report_data):
+    """
+    Genera el contenido de un archivo PDF a partir de los datos de un informe.
+    Args:
+        report_data (dict): Diccionario con la información del informe.
+    Returns:
+        BytesIO: Buffer de bytes con el contenido del archivo PDF.
+    """
     pdf_buffer = BytesIO()
     pdf = canvas.Canvas(pdf_buffer)
 
@@ -154,6 +228,14 @@ def generate_pdf_content(report_data):
     return pdf_buffer
 
 def generate_pdf_content_by_user(report_data, db):
+    """
+    Genera el contenido de un archivo PDF por usuario a partir de los datos de informes.
+    Args:
+        report_data (list): Lista de objetos de informes.
+        db: Sesión de la base de datos.
+    Returns:
+        BytesIO: Buffer de bytes con el contenido del archivo PDF.
+    """
     pdf_buffer = BytesIO()
     pdf = canvas.Canvas(pdf_buffer)
 

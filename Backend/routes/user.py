@@ -20,6 +20,14 @@ router = APIRouter()
 
 @router.post("/register_user/")
 async def register(new_user: UserCreate, db: Session = Depends(get_db)):
+    """
+    Endpoint para registrar un nuevo usuario.
+    Args:
+        new_user (UserCreate): Datos del nuevo usuario.
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        dict: Mensaje indicando que el usuario se registró correctamente o que ya existe.
+    """
     # Validar el correo electrónico
     email_validation(new_user.correo, db)
     # Validar la contraseña
@@ -42,6 +50,15 @@ async def register(new_user: UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login_user/")
 def login(correo: str, contrasena: str, db: Session = Depends(get_db)):
+    """
+    Endpoint para realizar el inicio de sesión.
+    Args:
+        correo (str): Correo electrónico del usuario.
+        contrasena (str): Contraseña del usuario.
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        dict: Token de acceso para el usuario.
+    """
     # Validar el correo electrónico
     email_validation(correo, db)
     # Verificar si el usuario existe
@@ -98,6 +115,14 @@ class Portador(HTTPBearer):
             
 @router.post("/exist_correo/{correo}")
 def exist_correo(correo: str, db: Session = Depends(get_db)):
+    """
+    Endpoint para verificar si un correo electrónico ya está registrado.
+    Args:
+        correo (str): Correo electrónico a verificar.
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        bool: True si el correo ya está registrado, False de lo contrario.
+    """
     # Verificar si el usuario existe
     usr = exist_email(correo, db)
     if not usr:
@@ -111,6 +136,14 @@ def exist_correo(correo: str, db: Session = Depends(get_db)):
 # obtener usuario por correo
 @router.get("/get_user/{correo}", dependencies=[Depends(Portador())])
 def get_user(correo: str, db: Session = Depends(get_db)):
+    """
+    Endpoint para obtener un usuario por su correo electrónico.
+    Args:
+        correo (str): Correo electrónico del usuario.
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        UserOut: Detalles del usuario.
+    """
     exist = exist_user(correo, db)
     if not exist:
         return {"message": "User not exist"}
@@ -121,11 +154,27 @@ def get_user(correo: str, db: Session = Depends(get_db)):
 # obtener todos los usuarios
 @router.get("/all_users/", dependencies=[Depends(Portador())])
 def get_all_users(db: Session = Depends(get_db)):
+    """
+    Endpoint para obtener todos los usuarios.
+    Args:
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        List[UserOut]: Lista de usuarios.
+    """
     return all_users(db)
 
 #Ruta para actualizar un usuario
 @router.put("/update_user/{user_id}", dependencies=[Depends(Portador())])
 def update_users(user_id:int, update_usr:UserUpdate, db: Session = Depends(get_db)):
+    """
+    Endpoint para actualizar la información de un usuario.
+    Args:
+        user_id (int): ID del usuario a actualizar.
+        update_usr (UserUpdate): Datos actualizados del usuario.
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        User: Datos del usuario actualizado.
+    """
     usr = update_user(user_id, update_usr, db)
     if usr:
         return usr
@@ -135,6 +184,14 @@ def update_users(user_id:int, update_usr:UserUpdate, db: Session = Depends(get_d
 # eliminar usuarios por id
 @router.delete("/delete/{user_id}", dependencies=[Depends(Portador())])
 def delete_user(user_id: int, db: Session = Depends(get_db)):
+    """
+    Endpoint para eliminar un usuario por su ID.
+    Args:
+        user_id (int): ID del usuario a eliminar.
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        dict: Mensaje indicando si el usuario se eliminó correctamente o no.
+    """
     userDeleted = delete_users(user_id, db)
     if not userDeleted:
         return {"message": "User not exist"}
@@ -148,6 +205,16 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
 
 @router.get("/management_fine/{correo}/{id_user}/{id_prestamo}", dependencies=[Depends(Portador())])
 def check_fines_and_deadlines(correo_usuario: str, id_usuario_prestamo: int, id_prestamo: int, db: Session = Depends(get_db)):
+    """
+    Endpoint para verificar multas y fechas de préstamo.
+    Args:
+        correo_usuario (str): Correo electrónico del usuario.
+        id_usuario_prestamo (int): ID del usuario asociado al préstamo.
+        id_prestamo (int): ID del préstamo.
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        dict: Información sobre la multa asociada al usuario y préstamo.
+    """
     # verificamos si el usuario existe
     exist_usr = exist_user(correo_usuario, db)
     # verificamos si el usuario tiene prestamos
@@ -170,6 +237,14 @@ def check_fines_and_deadlines(correo_usuario: str, id_usuario_prestamo: int, id_
 
 @router.get("/id_userToken/{token}", dependencies=[Depends(Portador())])
 def id_user_token(token: str, db: Session = Depends(get_db)):
+    """
+    Endpoint para obtener el ID de usuario a partir de un token.
+    Args:
+        token (str): Token de acceso.
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        dict: Información del ID de usuario asociado al token.
+    """
     respone = decode_token(token,db)
     return respone
 

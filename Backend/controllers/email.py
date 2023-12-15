@@ -19,6 +19,7 @@ load_dotenv(".env")
 smtp_password = os.getenv("SMTP_PASSWORD")
 smpt_from = os.getenv("SMTP_FROM")
 
+#Configuración de conexión a servidor SMTP, se utiliza el servicio de Gmail
 conf = ConnectionConfig(
     MAIL_USERNAME=smpt_from,
     MAIL_PASSWORD=smtp_password,
@@ -32,6 +33,15 @@ conf = ConnectionConfig(
 
 
 async def sendEmailSaleConfirmation(email: str, book: DigitalBookCreate, instance: User):
+    """
+    Envía un correo electrónico de confirmación de compra al usuario.
+    Args:
+        email (str): Correo electrónico del usuario.
+        book (DigitalBookCreate): Información del libro digital comprado.
+        instance (User): Información del usuario que realizó la compra.
+    Returns:
+        JSONResponse: Respuesta indicando si el correo electrónico fue enviado con éxito.
+    """
     template = f"""
         <!DOCTYPE html>
         <html>
@@ -131,6 +141,16 @@ async def sendEmailSaleConfirmation(email: str, book: DigitalBookCreate, instanc
 async def sendEmaiLoanConfirmation(
     email: str, book: PhysicalBook, loan: loanDueDate, instance: User
 ):
+    """
+    Envía un correo electrónico de confirmación y agradecimiento por el préstamo al usuario.
+    Args:
+        email (str): Correo electrónico del usuario.
+        book (PhysicalBook): Información del libro físico prestado.
+        loan (loanDueDate): Información sobre las fechas del préstamo.
+        instance (User): Información del usuario que realizó el préstamo.
+    Returns:
+        JSONResponse: Respuesta indicando si el correo electrónico fue enviado con éxito.
+    """
     text_loan_date = loan.fechaPrestamo.strftime("%A, %d de %B de %Y")
     text_loan_date_end = loan.fechaVencimiento.strftime("%A, %d de %B de %Y")
 
@@ -242,6 +262,15 @@ async def sendEmaiLoanConfirmation(
 
 # Función para enviar correo electrónico de bienvenida
 async def send_welcome_email(email: str, username: str, request: Request):
+    """
+    Envía un correo electrónico de bienvenida al usuario recién registrado.
+    Args:
+        email (str): Correo electrónico del usuario.
+        username (str): Nombre de usuario del usuario registrado.
+        request (Request): Objeto de solicitud.
+    Returns:
+        JSONResponse: Respuesta indicando si el correo electrónico fue enviado con éxito.
+    """
     template = f"""
          <!DOCTYPE html>
         <html>

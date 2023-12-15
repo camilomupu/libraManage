@@ -17,6 +17,25 @@ router = APIRouter()
 async def register_physicalBooks(correo:str,titulo:str,descripcion:str,ubicacion:str,
                   estado:str, id_autor:int, id_categoria:int, id_subcategoria:int
                   , file: UploadFile = None, url_image:str = None, db: Session = Depends(get_db)):
+    """
+    Endpoint para registrar un nuevo libro físico.
+    Args:
+        correo (str): Correo del usuario administrador.
+        titulo (str): Título del libro físico.
+        descripcion (str): Descripción del libro físico.
+        ubicacion (str): Ubicación física del libro.
+        estado (str): Estado actual del libro físico.
+        id_autor (int): ID del autor del libro.
+        id_categoria (int): ID de la categoría del libro.
+        id_subcategoria (int): ID de la subcategoría del libro.
+        file (UploadFile, optional): Archivo del libro físico. Defaults to None.
+        url_image (str, optional): URL de la imagen del libro físico. Defaults to None.
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Raises:
+        HTTPException: Se lanza si el usuario no es administrador o si falta la imagen o el archivo.
+    Returns:
+        dict: Mensaje indicando que el libro físico se creó correctamente.
+    """
     if not exist_user_admin(correo,db):
         raise HTTPException(status_code=400, detail="You are not admin")
     if file is None and url_image is None:
@@ -33,6 +52,15 @@ async def register_physicalBooks(correo:str,titulo:str,descripcion:str,ubicacion
 #obtener libro fisico por titulo
 @router.get("/book/{titulo}/{id_author}", dependencies=[Depends(Portador())])
 def get_physicalBook(titulo: str, id_author: int, db: Session = Depends(get_db)):
+    """
+    Endpoint para obtener los detalles de un libro físico por título y ID de autor.
+    Args:
+        titulo (str): Título del libro físico.
+        id_author (int): ID del autor del libro.
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        dict: Detalles del libro físico o mensaje indicando que el libro no existe.
+    """
     exist = exist_physicalBook(titulo, id_author, db)
     if not exist:
         return {"message": "Physical book not exist"}
@@ -42,11 +70,26 @@ def get_physicalBook(titulo: str, id_author: int, db: Session = Depends(get_db))
 #obtener todos los libros fisicos
 @router.get("/all_physicalBooks/", response_model=list[PhysicalBookOut])
 def get_all_physicalBook(db: Session = Depends(get_db)):
+    """
+    Endpoint para obtener todos los libros físicos.
+    Args:
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        list: Lista de libros físicos o mensaje indicando que no hay libros.
+    """
     return all_physicalBook(db)
 
 #eliminar libro fisico por id
 @router.delete("/delete_physicalBook/{id}", dependencies=[Depends(Portador())])
 def delete_physicalBookk(id: int, db: Session = Depends(get_db)):
+    """
+    Endpoint para eliminar un libro físico por ID.
+    Args:
+        id (int): ID del libro físico.
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        dict: Mensaje indicando que el libro físico se eliminó correctamente o que no existe.
+    """
     physicalBookDeleted = delete_physicalBook(id, db)
     if not physicalBookDeleted:
         return {"message": "Physical book not exist"}
@@ -57,7 +100,17 @@ def delete_physicalBookk(id: int, db: Session = Depends(get_db)):
 @router.get("/search_physicalBook/")
 def search_physical_book_endpoint(titulo: str = None, categoria: str = None, subcategoria: str = None, 
                                  autor: str = None, db: Session = Depends(get_db)):
-    
+    """
+    Endpoint para buscar libros físicos según diferentes criterios.
+    Args:
+        titulo (str, optional): Título del libro físico. Defaults to None.
+        categoria (str, optional): Categoría del libro físico. Defaults to None.
+        subcategoria (str, optional): Subcategoría del libro físico. Defaults to None.
+        autor (str, optional): Autor del libro físico. Defaults to None.
+        db (Session, optional): Sesión de la base de datos. Defaults to Depends(get_db).
+    Returns:
+        dict: Lista de libros físicos encontrados o mensaje indicando que no se encontraron libros.
+    """
     physicalBooks = search_physical_book(titulo, categoria, subcategoria, autor, db)
     if not physicalBooks:
         return {"message": "No physical books found with the criteria provided"}
