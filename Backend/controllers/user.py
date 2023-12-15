@@ -2,10 +2,11 @@ from fastapi.responses import JSONResponse
 from schemas.physicalBook import PhysicalBook
 from fastapi import HTTPException, status, Depends
 from pydantic import EmailStr
-from schemas.user import UserCreate, UserOut, User
+from schemas.user import UserCreate, UserOut, UserEdit
 from models.tables import Usuario
 from sqlalchemy import func, text
 from models.tables import LibroFisico, Multa, Prestamo, Usuario
+from controllers.rol import get_rol_id
 from passlib.context import CryptContext
 from controllers.hashing import Hasher
 from typing import List, Optional
@@ -19,12 +20,15 @@ password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def create_user(new_user: UserOut, db):
     hashed_password = password_context.hash(new_user.contrasena)
+    
     #usr = new_user.dict(exclude={'contrasena'})
     #usr['contrasena']=hashed_password
     usr = Usuario(**new_user.dict(exclude={'contrasena'}), contrasena=hashed_password)
     # Crear el token
     secret_key = "tu_clave_secreta"
     algorithm = "HS256"
+    rol_id = get_rol_id("Cliente", db)
+    usr.id_rol = rol_id
     payload = {
         "id": usr.id,
         "email": usr.correo,
@@ -86,22 +90,38 @@ def get_user(id: int, db):
     usr = db.query(Usuario).filter(Usuario.id == id).first()
     return usr
 
+def get_token (id: int, db):
+    usr = db.query(Usuario).filter(Usuario.id == id).first()
+    return usr.token
+
 
 def all_users(db):
     return db.query(Usuario).all()
 
-def update_user(user_id: int, updated_user: UserOut, db) -> Optional[UserOut]:
+def update_user(user_id: int, updated_user: UserEdit, db) -> Optional[UserOut]:
         usr = get_user(user_id, db)
+        secret_key = "tu_clave_secreta"
+        algorithm = "HS256"
+        
         if usr:
+            payload = {
+            "id": usr.id,
+            "email": usr.correo,
+            "role": updated_user.id_rol
+            }
             usr.nombre = updated_user.nombre
             usr.correo = updated_user.correo
             usr.fechaNacimiento = updated_user.fechaNacimiento
             usr.id_rol = updated_user.id_rol
-            usr.contrasena = usr.contrasena
+            usr.token = jwt.encode(payload, secret_key, algorithm)
             db.commit()  # Guarda los cambios en la base de datos
             db.refresh(usr)
             return usr
         return None
+
+def exist_email(email: str, db):
+    usr = db.query(Usuario).filter(Usuario.correo == email).first()
+    return usr
     
     
 def delete_users(id: int, db):

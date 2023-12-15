@@ -14,6 +14,14 @@ def exist_rol(rol_nombre: str, db):
     rol = db.query(Rol).filter(func.upper(Rol.nombre) == rol_nombre.upper()).first()
     return rol
 
+def exist_rolId(id_rol:int, db):
+    rol = db.query(Rol).filter(Rol.id == id_rol).first()
+    return rol
+
+def get_rol_id(name_rol:str, db):
+    rol = db.query(Rol).filter(func.upper(Rol.nombre) == name_rol.upper()).first()
+    return rol.id
+
 def all_roles(db):
     return db.query(Rol).all()
 

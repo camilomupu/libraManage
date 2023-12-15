@@ -43,6 +43,12 @@ def check_availabilityToday(id_book: int,db):
 def all_loan(db):
     return db.query(Prestamo).all()
 
+def all_loan_not_returned(db):
+    return db.query(Prestamo).filter(Prestamo.devuelto == False).all()
+
+def all_loan_by_user(id_user: int, db):
+    return db.query(Prestamo).filter(Prestamo.id_usuario == id_user).all()
+
 def return_loan_by_book_name_and_date(book_name: str, loan_date: dt.date, db):
     # Busca el libro físico por su nombre
     book = db.query(LibroFisico).filter_by(titulo=book_name).first()

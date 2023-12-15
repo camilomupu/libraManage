@@ -2,6 +2,7 @@ from fastapi import FastAPI, File, UploadFile
 from config.db import Base, engine
 from routes import user, physicalBook, loan, digitalBook, buyBook, category, subcategory, author, fine, rol, report, book
 from fastapi.middleware.cors import CORSMiddleware
+from controllers import chat
 
 Base.metadata.create_all(bind=engine)
 #Base.metadata.drop_all(engine) #borra toda la metadata, cuidado
@@ -44,6 +45,8 @@ app.include_router(rol.router, tags=["Rol"])
 app.include_router(report.router, tags=["Report"])
 
 app.include_router(book.router, tags=["Book"])
+
+app.include_router(chat.router, tags=["Chat"])
 
 
 @app.get("/", tags=["Main"])

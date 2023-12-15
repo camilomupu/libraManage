@@ -30,6 +30,9 @@ def get_BuysDBooks(id_user: int, db):
 def all_BuyDBooks(db):
     return db.query(CompraLibro).all()
 
+def all_BuyDBooks_by_user(id_user: int, db):
+    return db.query(CompraLibro).filter(CompraLibro.id_usuario == id_user).all()
+
 def delete_BuyDBook(id: int, db):
     try:
         compLibro = db.query(CompraLibro).filter(CompraLibro.id == id).first()
