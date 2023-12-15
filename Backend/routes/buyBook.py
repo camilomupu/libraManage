@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, Request
 from schemas.buyBook import BuyBookCreate, BuyBookOut
 from config.db import get_db
 from sqlalchemy.orm import Session
-from controllers.buyBook import create_BuyDBooks, exist_BuyDBook, all_BuyDBooks, delete_BuyDBook, get_BuysDBooks, delete_all_buy_books
+from controllers.buyBook import create_BuyDBooks, exist_BuyDBook, all_BuyDBooks, delete_BuyDBook, get_BuysDBooks, delete_all_buy_books, all_BuyDBooks_by_user
 from controllers.digitalBook import get_dBook
 from controllers.user import get_user
 from fastapi.responses import HTMLResponse
@@ -38,6 +38,11 @@ def get_buy_digital_book(id_user: int ,id_dBook: int, db: Session = Depends(get_
         return {"message": "Buy digital book not exist"}
     
     return BuyBookOut(**exist.__dict__)
+
+#obtener todas las compras por usuario
+@router.get("/all_buyBooks_by_user/{id_user}", response_model=list[BuyBookOut])
+def get_all_buy_digital_books_by_user(id_user: int ,db: Session = Depends(get_db)):
+    return all_BuyDBooks_by_user(id_user, db)
 
 #obtener todos los buyBooks
 @router.get("/all_buyBooks/", response_model=list[BuyBookCreate])
